@@ -227,7 +227,7 @@
         el.style.opacity = t.toFixed(3);
         el.style.transform = 'translateX(' + (dir * 130 * (1 - t)).toFixed(1) + '%) rotate(' + (rots[side][k] * t + dir * 12 * (1 - t)).toFixed(2) + 'deg)';
       });
-      if (medal) medal.style.transform = 'rotate(' + (p * 180).toFixed(1) + 'deg)';
+      if (medal) medal.style.transform = 'rotate(' + (Math.sin(p * Math.PI * 2) * 14).toFixed(1) + 'deg)';
     }
     stickyScene(haldi, '[data-hz]', 'data-ht');
     stickyScene(wed, '[data-wz]', 'data-wt');

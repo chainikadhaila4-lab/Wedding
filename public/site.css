@@ -41,3 +41,7 @@ nav a[href^="#"].active::after{transform:scaleX(1)}
   .dust,.petals{display:none}
   .halo::after,.sheen::after{animation:none}
 }
+
+/* iPhone Safari: keep photo columns from growing wider than the card */
+#top [style*="minmax(0px, 1.3fr)"] > *{min-width:0}
+#app [style*="aspect-ratio"]{min-width:0}
