@@ -39,5 +39,9 @@ a{color:#D4B679}a:hover{color:#E8D3A0}
 <div class="petals" id="petals" aria-hidden="true"></div>
 <script src="i18n.js"></script>
 <script src="site.js"></script>
+<audio id="bgm" src="assets/music.mp3" loop preload="auto"></audio>
+<script>
+document.addEventListener('click', function(){ var a=document.getElementById('bgm'); a.volume=0.5; a.play().catch(function(){}); }, { once:true });
+</script>
 </body>
 </html>
