@@ -245,19 +245,35 @@
 
   /* ---------------- reveal on scroll ---------------- */
   var rev = app.querySelectorAll('[data-reveal]');
+  var io = null;
   if ('IntersectionObserver' in window && !reduce) {
-    var io = new IntersectionObserver(function (es) {
+    io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'none'; io.unobserve(e.target); }
       });
     }, { threshold: 0.12 });
     rev.forEach(function (el) {
       var d = (el.dataset.reveal || 0) + 'ms';
-      el.style.opacity = '0'; el.style.transform = 'translateY(28px)';
-      el.style.transition = 'opacity 0.9s ease ' + d + ', transform 0.9s ' + OUT + ' ' + d;
+      el.style.opacity = '0';
+      el.style.transform = el.dataset.from === 'L' ? 'translateX(-70px) rotate(-2deg)' : el.dataset.from === 'R' ? 'translateX(70px) rotate(2deg)' : 'translateY(28px)';
+      el.style.transition = 'opacity 1.1s ease ' + d + ', transform 0.9s ' + OUT + ' ' + d;
       io.observe(el);
     });
   }
+
+  /* ---------------- see more / show less (families) ---------------- */
+  app.querySelectorAll('[data-toggle]').forEach(function (btn) {
+    var fold = app.querySelector('[data-fold="' + btn.dataset.toggle + '"]');
+    var lab = btn.querySelector('[data-t="more"],[data-t="less"]');
+    btn.addEventListener('click', function () {
+      var open = !fold.classList.contains('open');
+      fold.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (lab) { lab.setAttribute('data-t', open ? 'less' : 'more'); lab.textContent = D[lang][open ? 'less' : 'more']; }
+      if (open && io) fold.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+      req();
+    });
+  });
 
   /* ---------------- small touches ---------------- */
   var dir = app.querySelector('a[href*="maps.app.goo.gl"]'); if (dir) dir.classList.add('sheen');
