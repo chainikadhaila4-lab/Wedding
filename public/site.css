@@ -45,3 +45,58 @@ nav a[href^="#"].active::after{transform:scaleX(1)}
 /* iPhone Safari: keep photo columns from growing wider than the card */
 #top [style*="minmax(0px, 1.3fr)"] > *{min-width:0}
 #app [style*="aspect-ratio"]{min-width:0}
+
+/* ---- small and short phones ---- */
+/* family titles fit side by side on narrow screens */
+[data-t="uk"],[data-t="mh"]{font-size:min(1em,7.4vw)}
+/* Haldi & Wedding scenes: keep the text above the couple on shorter screens */
+@media (max-height:760px),(max-width:370px){
+  [data-ht="0.07"] span:nth-child(2),[data-wt="0.07"] span:nth-child(2){font-size:68px!important}
+  [data-haldi] h3,[data-wedding] h3{font-size:clamp(38px,11vw,48px)!important}
+  [data-ht="0.48"],[data-wt="0.48"]{margin-top:12px!important}
+  [data-ht="0.24"],[data-wt="0.24"]{margin-top:12px!important}
+}
+@media (max-height:680px){
+  [data-haldi] > div > div:last-child,[data-wedding] > div > div:last-child{top:96px!important}
+  [data-ht="0.07"] span:nth-child(2),[data-wt="0.07"] span:nth-child(2){font-size:56px!important}
+}
+
+/* ---------------- Two families (bride side / groom side) ---------------- */
+.fam{container-type:inline-size;padding:60px 18px 64px;background:radial-gradient(ellipse at 50% 20%,#4E1420 0%,#3A0D16 55%,#2C0A11 100%)}
+.fam-head{text-align:center;margin-bottom:28px}
+.fam-dev{font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:17px;color:#D4B679;margin-bottom:8px}
+.fam-head h2{margin:0;font-weight:300;font-size:clamp(40px,10cqw,64px);line-height:1.1;color:#F1EADC}
+.fam-list{display:flex;flex-direction:column;gap:26px}
+.fam-card{position:relative;width:100%;aspect-ratio:736/1104;container-type:inline-size;overflow:hidden;box-shadow:0 30px 60px -24px rgba(0,0,0,.75)}
+.fam-bg{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill}
+.fam-in{position:absolute;left:18%;right:18%;top:14.5%;height:52%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1.6cqw;text-align:center}
+.fam-lbl{font-family:Jost,Mukta,sans-serif;font-weight:500;font-size:2.7cqw;letter-spacing:.28em;color:#8E2A1E}
+.fam-region{font-family:'Cormorant Garamond','Tiro Devanagari Hindi',Georgia,serif;font-weight:400;font-size:7.4cqw;line-height:1.05;color:#7A1E2A}
+.fam-sub{font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:3.6cqw;color:#9A5A10;margin-top:-.6cqw}
+.fam-photos{position:relative;width:34cqw;aspect-ratio:4/5;margin-top:1cqw;border-radius:999px 999px 0 0;overflow:hidden;background:#EADFCB;box-shadow:0 0 0 1.2cqw #FFF8EC,0 0 0 1.5cqw rgba(154,90,16,.55),0 14px 28px -14px rgba(0,0,0,.5)}
+.fam-photos img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:famFade 12s infinite}
+.fam-photos img:nth-child(2){animation-delay:4s}
+.fam-photos img:nth-child(3){animation-delay:8s}
+@keyframes famFade{0%{opacity:0;transform:scale(1.08)}6%{opacity:1}33%{opacity:1}39%{opacity:0;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+.fam-name{font-family:'Pinyon Script','Tiro Devanagari Hindi',cursive;font-size:8cqw;line-height:1.1;color:#7A1E2A;margin-top:1.4cqw}
+html:not([lang=en]) .fam-name,#app:not([lang=en]) .fam-name{font-family:'Tiro Devanagari Hindi',serif;font-size:6.6cqw}
+.fam-parents{font-family:'Cormorant Garamond','Tiro Devanagari Hindi',Georgia,serif;font-style:italic;font-size:3.9cqw;line-height:1.35;color:#5A3E36;max-width:62cqw}
+.fam-card.groom .fam-lbl{color:#1F4D45}
+.fam-card.groom .fam-region,.fam-card.groom .fam-name{color:#1F4D45}
+.fam-card.groom .fam-sub{color:#8A1F4F}
+.fam-card.groom .fam-photos{box-shadow:0 0 0 1.2cqw #FFF8EC,0 0 0 1.5cqw rgba(31,77,69,.6),0 14px 28px -14px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:reduce){.fam-photos img{animation:none}.fam-photos img:first-child{opacity:1}}
+/* keep the text inside the open part of the arch */
+.fam-in{top:25.5%!important;height:62%!important;left:19%!important;right:19%!important;gap:1.3cqw!important}
+.fam-photos{width:30cqw!important}
+/* groom side: blue and saffron frame */
+.fam-card.groom .fam-lbl{color:#C0561A}
+.fam-card.groom .fam-region,.fam-card.groom .fam-name{color:#1F3F73}
+.fam-card.groom .fam-sub{color:#C0561A}
+.fam-card.groom .fam-photos{box-shadow:0 0 0 1.2cqw #FFF8EC,0 0 0 1.5cqw rgba(31,63,115,.6),0 14px 28px -14px rgba(0,0,0,.5)}
+/* fit text between the arch top and the drum / turban */
+.fam-in{top:28.5%!important;gap:1.1cqw!important}
+.fam-photos{width:24cqw!important}
+.fam-name{font-size:7.2cqw;margin-top:.6cqw}
+.fam-parents{font-size:3.4cqw;max-width:66cqw}
+.fam-lbl{font-size:2.5cqw}
