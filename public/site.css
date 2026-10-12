@@ -65,3 +65,8 @@ nav a[href^="#"].active::after{transform:scaleX(1)}
 [data-toggle][aria-expanded="true"] span:last-child{transform:translateY(2px) rotate(-135deg)!important}
 /* frame cards never wider than the phone */
 #homes > div{max-width:100%}
+
+/* frame cards keep the frame artwork's own 2:3 shape, whatever the language or phone width */
+#homes [style*="border-image"]{min-height:150cqw}
+/* heading keeps two lines of space so switching language does not shift the cards */
+#homes h2{min-height:2.1em}
