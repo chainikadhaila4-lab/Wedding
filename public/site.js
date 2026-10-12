@@ -38,7 +38,7 @@
     });
     app.setAttribute('lang', l);
     document.documentElement.lang = l;
-    app.querySelectorAll('[data-dev]').forEach(function (el) { el.style.display = l === 'en' ? '' : 'none'; });
+    app.querySelectorAll('[data-dev]').forEach(function (el) { el.style.visibility = l === 'en' ? '' : 'hidden'; });
     app.querySelectorAll('[data-lang]').forEach(function (b) {
       var on = b.dataset.lang === l;
       b.style.background = on ? '#D4B679' : 'transparent';
