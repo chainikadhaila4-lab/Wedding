@@ -15,7 +15,10 @@ body.locked{overflow:hidden}
 /* petal shower after the envelope opens */
 .petals{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
 .petal{position:absolute;top:-40px;will-change:transform;animation:fall linear forwards}
-.petal b{display:block;border-radius:80% 0 80% 0;animation:sway ease-in-out infinite alternate}
+.petal{perspective:400px}
+.petal b{display:block;border-radius:100% 0 100% 0/100% 0 100% 0;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:inset -1px -2px 3px rgba(0,0,0,.18),0 2px 4px rgba(0,0,0,.15);animation:flutter ease-in-out infinite alternate;transform-style:preserve-3d}
+.petal i{position:absolute;inset:18% 30% 18% 30%;border-left:1px solid rgba(255,255,255,.35);transform:rotate(45deg)}
+@keyframes flutter{0%{transform:rotate3d(1,.4,0,0deg) translateX(-10px)}50%{transform:rotate3d(.3,1,.2,70deg) translateX(6px)}100%{transform:rotate3d(1,.2,.4,160deg) translateX(12px)}}
 @keyframes fall{to{transform:translate3d(var(--dx),110vh,0) rotate(var(--rot))}}
 @keyframes sway{from{transform:rotate(-25deg) translateX(-8px)}to{transform:rotate(25deg) translateX(8px)}}
 
@@ -65,8 +68,488 @@ nav a[href^="#"].active::after{transform:scaleX(1)}
 [data-toggle][aria-expanded="true"] span:last-child{transform:translateY(2px) rotate(-135deg)!important}
 /* frame cards never wider than the phone */
 #homes > div{max-width:100%}
+[data-from]{transform:none!important}
 
-/* frame cards keep the frame artwork's own 2:3 shape, whatever the language or phone width */
-#homes [style*="border-image"]{min-height:150cqw}
-/* heading keeps two lines of space so switching language does not shift the cards */
-#homes h2{min-height:2.1em}
+.petal.lotus b{background:none;box-shadow:none;border-radius:0;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));animation:bob 2.6s ease-in-out infinite alternate}
+.petal.lotus b i{display:none}
+@keyframes bob{from{transform:rotate(-12deg) translateX(-8px)}to{transform:rotate(12deg) translateX(8px)}}
+
+/* letter blooms into the card; card fills the first screen */
+.bloom{position:fixed;inset:0;z-index:60;pointer-events:none;background:#F2EEE5}
+#top{padding:56px 0 0!important;background:#F2EEE5!important}
+#top>div:first-child{max-width:none!important;box-shadow:none!important;min-height:calc(100svh - 56px);display:flex}
+#top>div:first-child>div{flex:1;justify-content:center}
+#top a[href="#homes"]{color:#7A1E2A!important}
+/* logo not used anywhere */
+img[src*="logo.png"]{display:none!important}
+
+/* Two homes: one illustrated scene with pop-up callouts */
+.th{background:#F3E6CF}
+.th-art{position:relative;width:100%;aspect-ratio:2/3;overflow:hidden}
+.th-art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.th-title{position:absolute;left:20%;right:20%;top:19.5%;text-align:center;color:#5A1422}
+.th-k{margin:0 0 6px;font:500 9px/1.4 Jost,Mukta,sans-serif;letter-spacing:.24em;color:#8A2A1E}
+.th-title h2{margin:0;font-weight:400;font-size:clamp(22px,7cqw,34px);line-height:1.05;text-wrap:balance}
+.th-title em{display:block;font-family:'Pinyon Script','Tiro Devanagari Hindi',cursive;font-style:normal;font-size:1.15em;color:#9A2418}
+.th-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.th-arrow{fill:none;stroke:#7A1E2A;stroke-width:3;stroke-dasharray:6 7;stroke-linecap:round;opacity:0;transition:opacity .3s}
+.th-arrow.on{opacity:.85;animation:thdraw .9s ease forwards}
+@keyframes thdraw{from{stroke-dashoffset:260}to{stroke-dashoffset:0}}
+.th-dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;padding:0;border:2px solid #FFF6E6;border-radius:50%;background:#B5223A;box-shadow:0 2px 8px rgba(60,10,20,.45);cursor:pointer;transform:scale(0);transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.th-dot::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(255,246,230,.9);opacity:0}
+.th-dot.on{transform:scale(1)}
+.th-dot.on::after{animation:thping 2.2s ease-out infinite}
+@keyframes thping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+.th-lab{position:absolute;box-sizing:border-box;padding:6px 8px 7px;background:rgba(255,248,236,.94);border:1px solid rgba(154,36,24,.35);border-radius:10px;box-shadow:0 6px 16px -8px rgba(60,10,20,.5);color:#4A2A26;font-size:clamp(10.5px,2.9cqw,13px);line-height:1.28;opacity:0;transform:translateY(8px) scale(.94);transition:opacity .5s,transform .5s cubic-bezier(.3,1.4,.5,1)}
+.th-lab b{display:block;font-weight:500;font-size:1.18em;color:#9A2418;margin-bottom:2px}
+.th-lab.on{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.th-dot,.th-lab{transition:none}.th-arrow.on{animation:none}}
+
+#families > div{max-width:100%}
+[data-from]{transition:opacity 1.3s ease!important}
+
+/* soft hand-off from the groom's frame into The Celebrations */
+.fam-blend{position:relative;height:200px;margin-top:-2px;background:linear-gradient(180deg,#F3DFBC 0%,#E9C9A0 18%,#B9776A 45%,#6E2733 72%,#3A0D16 100%)}
+.fam-blend::after{content:"";position:absolute;left:0;right:0;top:38%;height:30px;
+  background:radial-gradient(circle 4px at 50% 50%,rgba(233,199,123,.9) 3px,transparent 4px) 0 0/26px 30px repeat-x;opacity:.8}
+#events{position:relative}
+#events [data-scene]{animation:none}
+
+/* Two homes pins while family photos fly in on scroll */
+#homes.th{height:210vh;height:210svh;background:#3A0D16}
+.th-art{position:relative;width:100%}
+.th-fam{position:absolute;inset:0;pointer-events:none}
+.th-col{position:absolute;top:37%;bottom:3%;width:46%}
+.th-col.b{left:3%}.th-col.g{right:3%}
+.th-tag{position:absolute;left:0;right:0;top:-5%;z-index:3;margin:0;text-align:center;font:500 9px/1 Jost,Mukta,sans-serif;letter-spacing:.2em;color:#FFF6E6;opacity:0}
+.th-tag span{display:inline-block;padding:6px 10px;background:#9A2418;border-radius:999px;box-shadow:0 4px 10px -4px rgba(0,0,0,.5)}
+.th-pol{position:absolute;left:8%;width:84%;margin:0;padding:5px 5px 18px;background:#FFF8EC;box-shadow:0 10px 22px -10px rgba(30,5,10,.7);opacity:0;will-change:transform,opacity}
+.th-pol img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
+.th-pol[data-n="0"]{top:4%}.th-pol[data-n="1"]{top:29%}.th-pol[data-n="2"]{top:54%}
+
+/* pinned stage: the scene sits on a soft, blurred extension of itself */
+.th-stick{position:sticky;top:0;height:100vh;height:100svh;display:flex;align-items:center;overflow:hidden}
+.th-blur{position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 45%,#5A1622 0%,#3A0D16 70%)}
+.th-blur::after{content:none}
+.th-art{border-radius:18px;box-shadow:0 30px 60px -30px rgba(0,0,0,.8);will-change:transform}
+#homes.th{background:#3A0D16}
+/* card hands off softly into the scene */
+#top{-webkit-mask-image:none}
+
+
+/* Devanagari type: Martel for reading, Amita (calligraphic) for names and flourishes */
+html[lang="hi"] body,html[lang="mr"] body,
+html[lang="hi"] [style*="Cormorant"],html[lang="mr"] [style*="Cormorant"],
+html[lang="hi"] [style*="Tiro Devanagari"],html[lang="mr"] [style*="Tiro Devanagari"]{font-family:'Martel','Mukta',serif!important}
+[style*='family: "Tiro Devanagari Hindi"']{font-family:'Martel','Tiro Devanagari Hindi',serif!important}
+html[lang="hi"] [style*="Pinyon"],html[lang="mr"] [style*="Pinyon"],
+html[lang="hi"] .th-title em,html[lang="mr"] .th-title em{font-family:'Amita','Martel',cursive!important;font-weight:700!important}
+html[lang="hi"] [style*="Jost"],html[lang="mr"] [style*="Jost"],html[lang="hi"] .th-tag,html[lang="mr"] .th-tag{font-family:'Mukta',sans-serif!important;letter-spacing:0!important}
+html[lang="hi"] [style*="font-style: italic"],html[lang="mr"] [style*="font-style: italic"]{font-style:normal!important}
+
+/* no hard seams: each section melts over the one before it */
+#homes.th{padding-bottom:0}
+#events{margin-top:-40px;z-index:2;background:#3A0D16;border-radius:28px 28px 0 0}
+#venue{position:relative;z-index:3;margin-top:-36px;border-radius:28px 28px 0 0;box-shadow:0 -20px 40px -20px rgba(0,0,0,.6)}
+footer{position:relative;z-index:4;margin-top:-30px;border-radius:28px 28px 0 0;box-shadow:0 -20px 40px -20px rgba(0,0,0,.6)}
+
+/* consistent rhythm */
+#events{padding-top:88px!important;padding-bottom:88px!important}
+#venue{padding-top:88px!important;padding-bottom:96px!important}
+[data-flow]{will-change:transform,opacity;transform-origin:50% 50%}
+
+/* first screen: Ganesh ji + shloka above the envelope */
+[data-k="loader"]{display:none!important}
+.eg{display:flex;flex-direction:column;align-items:center;gap:8px}
+.eg [data-k="ld-g"]>div{width:62px!important;height:62px!important;padding:2px!important;box-shadow:0 0 24px rgba(212,182,121,.3)!important}
+.eg [data-k="ld-l0"]{font-size:18px!important}
+.eg [data-k="ld-l1"],.eg [data-k="ld-l2"]{font-size:15px!important;line-height:1.55!important}
+.eg>div:last-child{margin-top:2px}
+[data-k="env"]{justify-content:flex-start!important;padding-top:max(52px,6svh)!important;gap:14px!important}
+[data-k="env-top"]{transform:none!important}
+[data-k="env-bob"]{width:min(calc(100vw - 36px),440px,calc((100svh - 230px)*.8))!important}
+/* the letter unrolls into the page like a scroll */
+.scrollov{position:fixed;inset:0;z-index:70;pointer-events:none}
+.scrollov .paper{position:absolute;inset:0;background:#F2EEE5}
+.scrollov .rod{position:absolute;left:4%;right:4%;height:22px;border-radius:11px;background:linear-gradient(180deg,#B07A45,#7A4A26 55%,#5B3A20);box-shadow:0 6px 14px -4px rgba(0,0,0,.5)}
+.scrollov .rod::before,.scrollov .rod::after{content:"";position:absolute;top:-5px;width:16px;height:32px;border-radius:8px;background:linear-gradient(180deg,#F1D48E,#C9A152)}
+.scrollov .rod::before{left:-10px}.scrollov .rod::after{right:-10px}
+.scrollov .sw{position:absolute;left:0;right:0;transform:translateY(-50%);text-align:center;font-family:'Cormorant Garamond','Martel',serif;font-weight:500;text-transform:uppercase;letter-spacing:.1em;font-size:clamp(30px,9vw,44px);line-height:1.1;color:#7A1E2A;padding:0 14%}
+
+/* end of the invitation: a swaying marigold toran with temple bells leads into Two homes */
+#top [data-scene],#top a[aria-label="Scroll down"]:not(.tcue){display:none!important}
+#top{padding-bottom:0!important}
+.tband{position:relative;width:100%;margin-top:-2px;z-index:3}
+.tband svg{display:block;width:100%;height:auto;overflow:visible}
+.tb-swag{animation:tbSway 4.5s ease-in-out infinite alternate}
+.tb-swag:nth-child(odd){animation-delay:-2s}
+.tb-bell{animation:tbBell 3.2s ease-in-out infinite alternate}
+.tb-bell:nth-of-type(2){animation-delay:-1.4s}
+@keyframes tbSway{from{transform:rotate(-1.2deg)}to{transform:rotate(1.2deg)}}
+@keyframes tbBell{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+.tcue{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0 26px;color:#7A1E2A;text-decoration:none;font:500 11px Jost,Mukta,sans-serif;letter-spacing:.32em}
+.tcue i{width:10px;height:10px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);animation:tcue 1.6s ease-in-out infinite}
+@keyframes tcue{0%,100%{transform:translateY(0) rotate(45deg);opacity:.5}50%{transform:translateY(6px) rotate(45deg);opacity:1}}
+/* the Two homes scene fills the whole screen, no empty band */
+.th-art{height:100%;aspect-ratio:auto;border-radius:0;box-shadow:none}
+.th-stick{align-items:stretch}
+@media (prefers-reduced-motion:reduce){.tb-swag,.tb-bell,.tcue i{animation:none}}
+
+/* Devanagari must never be letter-spaced: spacing breaks conjuncts like क्ष, श्री, र्ष */
+html[lang="hi"] *,html[lang="mr"] *{letter-spacing:0!important;font-feature-settings:normal}
+:lang(hi),:lang(mr){letter-spacing:0!important}
+[data-t="blessing"],.eg [data-k^="ld-"]{letter-spacing:0!important}
+/* decorative two-language captions removed so Hindi and Marathi never mix */
+[data-dev]{display:none!important}
+
+/* logo only in the top bar */
+nav img[src*="logo.png"]{display:block!important}
+
+/* Our Story */
+.story{position:relative;z-index:2;margin-top:-40px;border-radius:28px 28px 0 0;padding:88px 24px 96px;text-align:center;
+  background:radial-gradient(120% 60% at 50% 0%,#F7EEDD 0%,#EFE2C8 70%,#E8D6B6 100%);color:#4A2A26;box-shadow:0 -20px 40px -20px rgba(0,0,0,.5)}
+.st-in{max-width:440px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.st-k{margin:0;font:500 11px Jost,Mukta,sans-serif;letter-spacing:.32em;color:#9A2418}
+.st-h{margin:10px 0 18px;font-family:'Pinyon Script','Amita',cursive;font-weight:400;font-size:clamp(52px,15cqw,68px);line-height:1.05;color:#7A1E2A}
+.st-lead{margin:0 0 34px;font-style:italic;font-size:21px;line-height:1.5;color:#5A1422;text-wrap:balance}
+.st-p{margin:0 0 22px;font-size:18px;line-height:1.65;text-wrap:pretty}
+.st-last{margin-bottom:0}
+.st-path{position:relative;width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 36px}
+.st-line{position:absolute;left:12.5%;right:12.5%;top:9px;height:2px;background:linear-gradient(90deg,#C9A24E,#9A2418);transform-origin:0 50%;transform:scaleX(var(--p,0))}
+.st-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.st-step b{width:20px;height:20px;border-radius:50%;background:#F7EEDD;border:2px solid #C9A24E;transform:scale(.6);transition:transform .5s cubic-bezier(.3,1.6,.5,1),background .4s}
+.st-step span{font:500 10px Jost,Mukta,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9A2418;opacity:.35;transition:opacity .5s}
+.st-step.on b{transform:scale(1);background:#9A2418}
+.st-step.on span{opacity:1}
+.st-step[data-i="3"].on b{background:radial-gradient(circle,#F28C1E 30%,#9A2418 32%)}
+.st-orn{display:flex;align-items:center;gap:12px;margin:6px 0 28px}
+.st-orn span{width:40px;height:1px;background:rgba(154,36,24,.5)}.st-orn i{width:6px;height:6px;background:#9A2418;transform:rotate(45deg)}
+html[lang="hi"] .st-step span,html[lang="mr"] .st-step span{font-size:13px;text-transform:none}
+
+/* the logo pressed into the wax seal, in red */
+[data-k="env-seal"] img{display:block!important}
+
+/* no shloka on the first screen, just Ganesh ji and the short invocation */
+.eg [data-k="ld-l1"],.eg [data-k="ld-l2"],.eg [data-k="ld-dia"]{display:none!important}
+.eg [data-k="ld-l0"]{font-size:15px!important}
+/* card spacing */
+#top>div:first-child>div{justify-content:flex-start!important;padding-top:44px!important;padding-bottom:44px!important}
+#top [data-t="bride"],#top [data-t="groom"]{white-space:nowrap}
+#top [data-t="bride"]::before,#top [data-t="groom"]::before{content:none}
+
+/* the two big family group photos sit on top of the stack */
+.th-pol[data-n="0"]{z-index:1}.th-pol[data-n="1"]{z-index:2}.th-pol[data-n="2"]{z-index:3}
+
+/* ===== dive-in opening: the envelope opens onto the Two homes scene ===== */
+.th-names{position:absolute;left:8%;right:8%;top:36%;text-align:center;color:#5A1422;z-index:4;pointer-events:none}
+.th-nk{margin:0 0 6px;font:500 10px Jost,Mukta,sans-serif;letter-spacing:.3em;color:#8A2A1E}
+.th-nn{margin:0;font-family:'Pinyon Script','Amita',cursive;font-size:clamp(46px,14cqw,66px);line-height:1.05;color:#7A1E2A;text-shadow:0 2px 14px rgba(255,248,236,.9)}
+.th-na{margin:-4px 0;font-family:'Pinyon Script',cursive;font-size:30px;color:#B5223A}
+.th-nd{margin:10px 0 0;font:500 12px Jost,Mukta,sans-serif;letter-spacing:.24em;color:#5A1422}
+.th-bank{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:20%;z-index:2;pointer-events:none;transform-origin:50% 100%}
+.th-leaf{position:absolute;top:-2%;width:42%;height:auto;z-index:2;pointer-events:none}
+.th-leaf.l{left:-4%}.th-leaf.r{right:-4%;transform:scaleX(-1)}
+.th-fam{z-index:3}
+#homes .th-title{z-index:4}
+/* before opening, the scene waits behind the envelope */
+body.locked #homes .th-names>*,body.locked #homes .th-title{opacity:0}
+
+/* drawn flower bank and leaves removed: they looked too digital over the painting */
+.th-bank,.th-leaf{display:none!important}
+
+/* quiet lotus divider instead of the drawn toran */
+.tband{display:flex;justify-content:center;padding:28px 0 6px}
+.tband svg{width:220px;max-width:70%;height:auto}
+
+/* Celebrations opener: a row of brass diyas lights up one by one */
+#events>[data-scene]{display:none!important}
+.diyas{display:flex;justify-content:center;align-items:flex-end;gap:clamp(6px,3vw,18px);margin:-24px auto 22px;max-width:420px}
+.diya{width:clamp(48px,15vw,70px);transform:translateY(calc((2 - var(--d,0)) * 0px))}
+.diya:nth-child(1),.diya:nth-child(5){margin-bottom:0}
+.diya:nth-child(2),.diya:nth-child(4){margin-bottom:12px}
+.diya:nth-child(3){margin-bottom:20px}
+.diya svg{display:block;width:100%;height:auto;overflow:visible}
+.d-flame{transform-origin:40px 44px;transform:scale(0);opacity:0}
+.d-glow{opacity:0;transform-origin:40px 34px}
+.diyas.lit .d-flame{animation:dIgnite .7s cubic-bezier(.3,1.6,.5,1) forwards,dFlick 1.6s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.35s),calc(var(--i)*.35s + .7s)}
+.diyas.lit .d-glow{animation:dGlow 1s ease forwards,dPulse 2.4s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.35s),calc(var(--i)*.35s + 1s)}
+@keyframes dIgnite{0%{transform:scale(0);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes dFlick{0%{transform:scale(1) skewX(0)}30%{transform:scale(1.04,.96) skewX(2deg)}60%{transform:scale(.97,1.05) skewX(-2deg)}100%{transform:scale(1.02,.98) skewX(1deg)}}
+@keyframes dGlow{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes dPulse{from{opacity:.8;transform:scale(.95)}to{opacity:1;transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.d-flame,.d-glow{transform:none!important;opacity:1!important;animation:none!important}}
+
+/* kicker above Two homes title removed (the photo tags already say it) */
+.th-title .th-k{display:none!important}
+
+/* Option 4: gold-foil "You are invited" above, names on the rising letter */
+.inv-above{margin:4px 0 0;font-family:'Cinzel','Martel',serif;font-weight:500;font-size:clamp(17px,5vw,22px);letter-spacing:.2em;text-align:center;
+  background:linear-gradient(100deg,#9C6A24 15%,#F6E2A8 38%,#D4B679 52%,#9C6A24 72%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:foil 4s linear infinite}
+@keyframes foil{from{background-position:120% 0}to{background-position:-120% 0}}
+html[lang="hi"] .inv-above,html[lang="mr"] .inv-above{font-family:'Martel',serif!important;font-size:19px}
+.lt-names{margin-top:9%;display:flex;flex-direction:column;align-items:center;font-family:'Playfair Display','Amita',serif;font-style:italic;color:#7A1E2A;font-size:clamp(28px,9cqw,40px);line-height:1.08}
+.lt-names em{font-size:.6em;color:#B5223A;margin:2px 0}
+html[lang="hi"] .lt-names,html[lang="mr"] .lt-names{font-family:'Amita','Martel',serif!important;font-style:normal}
+@media (prefers-reduced-motion:reduce){.inv-above{animation:none}}
+
+body.opening [data-k="env-seal"]{opacity:0!important;transition:opacity .45s ease}
+
+.inv-above{position:relative;z-index:50}
+[data-k="env-top"]{position:relative;z-index:50}
+.inv-above{filter:drop-shadow(0 1px 2px rgba(30,6,11,.85))}
+
+/* ===== softer hand-offs: no hard card edges, sections melt into each other ===== */
+#top{margin-top:-120px!important;padding-top:120px!important;position:relative;z-index:2;background:linear-gradient(180deg,rgba(242,238,229,0) 0,rgba(242,238,229,.85) 70px,#F2EEE5 120px)!important}
+.story{margin-top:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(180deg,#F2EEE5 0,#EFE2C8 45%,#E8D6B6 100%)!important}
+#events{margin-top:0!important;border-radius:0!important;padding-top:200px!important;background:linear-gradient(180deg,#E8D6B6 0,#B9876A 70px,#6E2733 140px,#3A0D16 200px)!important}
+#venue{margin-top:0!important;border-radius:0!important;box-shadow:none!important;background:#3A0D16!important}
+footer{margin-top:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(180deg,#3A0D16 0,#22070D 160px)!important}
+
+/* card names in the same elegant italic as the envelope letter */
+html[lang="en"] #top [style*="Pinyon"]{font-family:"Playfair Display","Cormorant Garamond",serif!important;font-style:italic!important;font-weight:400!important;letter-spacing:.01em}
+html[lang="en"] #top h1[style*="Pinyon"],html[lang="en"] #top div[style*="Pinyon"][style*="84px"]{font-size:clamp(46px,13cqw,64px)!important;line-height:1.1!important}
+
+/* welcome paragraph on the card uses more of the width */
+#top [data-t="cardInv"]{display:block}
+#top div:has(> [data-t="cardInv"]){max-width:min(94%,460px)!important;font-size:18px!important}
+#top p:has(> [data-t="cardClose"]),#top p:has(> [data-t="bridePar"]),#top p:has(> [data-t="groomPar"]){max-width:min(94%,440px)!important}
+
+/* no GPU layer on scaled blocks: keeps photos and text crisp */
+[data-flow]{will-change:auto!important}
+
+/* letter: "You are" in a plain serif, "invited" in script */
+.lt-inv{margin-top:10%;display:flex;flex-direction:column;align-items:center;color:#7A1E2A;line-height:1}
+.lt-you{font-family:'Cormorant Garamond','Martel',serif;font-weight:500;font-size:clamp(22px,7cqw,30px);letter-spacing:.04em}
+.lt-cur{font-family:'Pinyon Script','Amita',cursive;font-size:clamp(52px,16cqw,72px);line-height:1.1;margin-top:2px}
+html[lang="hi"] .lt-cur,html[lang="mr"] .lt-cur{font-family:'Amita',cursive!important;font-weight:700;font-size:clamp(36px,11cqw,50px)}
+/* the gold line above would repeat the words, so it is hidden */
+.inv-above{display:none!important}
+
+/* Our Story photos: three polaroids between the journey line and the story */
+.st-pols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin:0 0 34px}
+.st-pol{margin:0;padding:6px 6px 10px;background:#FFFDF8;box-shadow:0 10px 22px -12px rgba(60,20,10,.55);transform:rotate(var(--r))}
+.st-ph{position:relative;aspect-ratio:4/5;overflow:hidden;background:repeating-linear-gradient(45deg,rgba(154,36,24,.07) 0 6px,transparent 6px 12px),#EFE4CF;display:flex;align-items:center;justify-content:center}
+.st-ph-l{font:500 9px Jost,sans-serif;letter-spacing:.2em;color:rgba(122,30,42,.55)}
+.st-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.st-pol figcaption{margin-top:7px;font-style:italic;font-size:13px;line-height:1.2;color:#7A1E2A}
+.st-pol:nth-child(2){margin-top:14px}
+
+/* Our Story: a little photo booth that prints your strip */
+.st-pols{display:none}
+.booth{position:relative;width:min(82%,300px);aspect-ratio:3/4.3;margin:4px auto 38px;padding:0;background:linear-gradient(180deg,#7A1E2E,#4E1220);border-radius:3px;box-shadow:0 24px 40px -22px rgba(40,8,14,.75),inset 0 0 0 2px rgba(255,255,255,.06)}
+.b-in{position:absolute;inset:7% 8% 0;overflow:hidden;background:#2E0A12}
+.b-ceil{position:absolute;inset:0;background:#5A1626;clip-path:polygon(0 0,100% 0,84% 8%,16% 8%)}
+.b-lw{position:absolute;inset:0;background:linear-gradient(90deg,#4A1020,#6E1A2C);clip-path:polygon(0 0,16% 8%,16% 80%,0 100%)}
+.b-rw{position:absolute;inset:0;background:linear-gradient(270deg,#4A1020,#6E1A2C);clip-path:polygon(100% 0,84% 8%,84% 80%,100% 100%)}
+.b-back{position:absolute;left:16%;right:16%;top:8%;bottom:20%;background:linear-gradient(180deg,#5E1424,#3E0D18)}
+.b-flash{position:absolute;inset:0;background:#FFF8E8;opacity:0}
+.b-floor{position:absolute;inset:0;clip-path:polygon(16% 80%,84% 80%,100% 100%,0 100%);
+  background:conic-gradient(#E9DCC0 25%,#5A1422 0 50%,#E9DCC0 0 75%,#5A1422 0) 0 0/12.5% 8%;transform-origin:50% 100%}
+.b-slot{position:absolute;left:36%;right:36%;top:10%;height:3px;background:#140407;border-radius:2px;box-shadow:0 1px 0 rgba(255,255,255,.12)}
+.b-mask{position:absolute;left:37%;right:37%;top:calc(10% + 2px);bottom:16%;overflow:hidden}
+.b-strip{background:#FBF5E8;padding:5px 5px 4px;display:flex;flex-direction:column;gap:4px;box-shadow:0 6px 12px -6px rgba(0,0,0,.6);transform:translateY(-102%);transition:transform 3.2s cubic-bezier(.45,.05,.3,1)}
+.b-shot{position:relative;aspect-ratio:1/1.05;background:repeating-linear-gradient(45deg,rgba(122,30,42,.08) 0 5px,transparent 5px 10px),#E9DFCC;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.b-shot span{font:500 9px Jost,sans-serif;color:rgba(122,30,42,.5)}
+.b-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:sepia(.15) contrast(1.02)}
+.b-mono{margin:2px 0 0;text-align:center;font-family:'Pinyon Script',cursive;font-size:13px;color:#7A1E2A;line-height:1.2}
+.b-mono i{font-style:normal;color:#B5223A}
+.booth.go .b-strip{transform:translateY(0)}
+.booth.go .b-flash{animation:bFlash .9s ease-out}
+@keyframes bFlash{0%{opacity:0}12%{opacity:.85}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.b-strip{transition:none;transform:none}}
+
+/* booth pins while each photo develops one by one */
+.b-wrap{position:relative;width:100%;height:230vh;height:230svh;margin:0 0 20px}
+.b-stick{position:sticky;top:0;height:100vh;height:100svh;display:flex;align-items:center;justify-content:center}
+.b-stick .booth{margin:0 auto;width:min(86%,320px)}
+.b-strip{transition:none!important}
+.b-shot img{opacity:var(--dev,0);filter:sepia(calc(.9 - var(--dev,0)*.75)) brightness(calc(1.6 - var(--dev,0)*.6))}
+.b-shot span{opacity:calc(1 - var(--dev,0))}
+
+/* families arrive side by side, then meet in the middle; hero names removed (they live on the card) */
+#homes.th{height:300vh;height:300svh}
+#homes .th-names{display:none!important}
+.th-col{transform-origin:50% 40%;will-change:transform}
+.th-col.b{z-index:1}.th-col.g{z-index:2}
+.th-one{position:absolute;left:0;right:0;bottom:4%;margin:0;text-align:center;z-index:5;opacity:0;pointer-events:none}
+.th-one span{display:inline-block;padding:8px 16px;background:#9A2418;color:#FFF6E6;border-radius:999px;font:italic 400 19px/1.1 'Playfair Display',Georgia,serif;box-shadow:0 6px 14px -6px rgba(0,0,0,.55)}
+html[lang="hi"] .th-one span,html[lang="mr"] .th-one span{font-family:'Tiro Devanagari Hindi','Mukta',serif;font-style:normal}
+
+/* Our Story: premium booth + a caption that changes with each frame */
+.st-path{display:none!important}
+.b-stick{flex-direction:column;gap:18px}
+.b-stick .booth{width:min(72%,290px);margin:46px auto 0;border-radius:6px 6px 4px 4px;
+  background:radial-gradient(ellipse at 50% 0%,#8E2436,transparent 70%),linear-gradient(180deg,#6E1828,#3E0C17);
+  box-shadow:inset 0 0 0 3px #3A0A14,inset 0 0 0 5px #C9A24E,inset 0 0 0 7px #3A0A14,inset 0 0 0 8px rgba(201,162,78,.55),0 30px 50px -24px rgba(40,8,14,.8)}
+.b-sign{position:absolute;left:10%;right:10%;top:-38px;height:44px;border-radius:8px 8px 3px 3px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,#FFF4CF 0 1.6px,#C9A24E 2.2px,transparent 3px) 0 0/12px 100% repeat-x,linear-gradient(180deg,#5A1220,#3A0A14);
+  background-position:6px 4px,0 0;box-shadow:inset 0 0 0 2px #C9A24E,0 6px 14px -6px rgba(0,0,0,.6),0 0 22px rgba(255,214,140,.25)}
+.b-sign::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:6px;background:radial-gradient(circle,#FFF4CF 0 1.6px,#C9A24E 2.2px,transparent 3px) 6px 0/12px 100% repeat-x}
+.b-sign span{font:500 13px/1 Cinzel,'Cormorant Garamond',serif;letter-spacing:.3em;margin-right:-.3em;color:#F3DFA8;text-shadow:0 0 8px rgba(255,214,140,.55)}
+.b-sign i{font-style:normal;color:#E8C77A}
+.b-in{inset:9% 9% 0!important;box-shadow:inset 0 0 0 2px #C9A24E}
+.b-cur{position:absolute;top:0;bottom:12%;width:22%;z-index:3;
+  background:repeating-linear-gradient(90deg,#7E1A2C 0 6px,#5A1020 6px 9px,#9A2638 9px 12px);box-shadow:0 0 12px rgba(0,0,0,.45)}
+.b-cur.l{left:0;clip-path:polygon(0 0,100% 0,62% 46%,78% 100%,0 100%);}
+.b-cur.r{right:0;clip-path:polygon(0 0,100% 0,100% 100%,22% 100%,38% 46%)}
+.b-val{position:absolute;left:0;right:0;top:0;height:9%;z-index:4;
+  background:radial-gradient(ellipse at 50% 0,#9A2638,#6E1828 70%);border-bottom:2px solid #C9A24E;
+  -webkit-mask:radial-gradient(circle at 50% 0,#000 70%,transparent 71%) 0 0/16.66% 200% repeat-x;mask:radial-gradient(circle at 50% 0,#000 70%,transparent 71%) 0 0/16.66% 200% repeat-x}
+.b-floor{background:conic-gradient(#F1E4C6 25%,#4A0F1C 0 50%,#F1E4C6 0 75%,#4A0F1C 0) 0 0/12.5% 8%!important}
+.b-slot{background:linear-gradient(#C9A24E,#8A6A2A)!important;height:5px!important;box-shadow:0 0 0 2px #3A0A14,0 2px 4px rgba(0,0,0,.5)!important;z-index:5}
+.b-mask{z-index:2}
+.b-strip{box-shadow:0 10px 18px -8px rgba(0,0,0,.7)!important}
+.b-foot{position:absolute;bottom:-9px;width:16%;height:9px;background:linear-gradient(#E3C27A,#8A6A2A);border-radius:0 0 4px 4px}
+.b-foot.l{left:10%}.b-foot.r{right:10%}
+.b-cap{position:relative;width:min(88%,340px);height:96px;text-align:center}
+.b-c{position:absolute;inset:0;opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.b-c.on{opacity:1;transform:none}
+.b-ck{margin:0 0 6px;font:500 11px/1 Jost,sans-serif;letter-spacing:.28em;color:#9A2418}
+.b-ck b{font-weight:500;color:#C9A24E;margin-right:10px}
+.b-cl{margin:0;font:italic 400 clamp(19px,5.2vw,23px)/1.3 'Playfair Display',Georgia,serif;color:#5A1422;text-wrap:balance}
+html[lang="hi"] .b-ck,html[lang="mr"] .b-ck{font-family:'Mukta',sans-serif;font-size:14px}
+html[lang="hi"] .b-cl,html[lang="mr"] .b-cl{font-family:'Tiro Devanagari Hindi','Mukta',serif;font-style:normal;font-size:19px;line-height:1.5}
+.b-wrap{height:320vh;height:320svh}
+
+/* story -> celebrations: marigold garlands fall, cover the screen, then part like curtains */
+.diyas{display:none!important}
+#events{padding-top:72px!important;background:#3A0D16!important}
+.mg{position:relative;height:240vh;height:240svh;background:#E8D6B6;z-index:2}
+.mg-stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.mg-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#4E1420,#3A0D16 70%);opacity:0}
+.mg-str{position:absolute;inset:0}
+.mg-s{position:absolute;top:0;display:flex;flex-direction:column;align-items:center;will-change:transform;transform:translateY(-110%)}
+.mg-s::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(120,70,20,.5)}
+.mg-s svg{display:block;position:relative;filter:drop-shadow(0 3px 3px rgba(60,20,0,.35))}
+.mg-s .bd{width:22%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFD9DF,#C2183A 60%,#7A0A20);margin:-6% 0;position:relative;z-index:1}
+.mg-s .lf{width:46%;aspect-ratio:2/1;background:linear-gradient(135deg,#6E9A3A,#2F5A1C);border-radius:0 100% 0 100%;margin:-12% 0;position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.mg{height:auto}.mg-stick{position:relative;height:120px}.mg-bg{opacity:1}}
+
+/* tighten the end of Our Story: one closing line, then garlands start falling over it */
+#story{padding-bottom:40px!important}
+#story .st-last{margin:0 auto!important;max-width:30ch;font-family:'Playfair Display',Georgia,serif!important;font-style:italic;font-size:clamp(19px,5vw,22px)!important;line-height:1.4!important;color:#5A1422!important}
+html[lang="hi"] #story .st-last,html[lang="mr"] #story .st-last{font-family:'Tiro Devanagari Hindi','Mukta',serif!important;font-style:normal}
+.mg{margin-top:-55vh;margin-top:-55svh;background:linear-gradient(180deg,transparent 0,transparent 55svh,#E8D6B6 55svh)!important;pointer-events:none}
+.b-wrap{margin-bottom:0!important}
+
+/* closing line appears under the strip once the last photo prints */
+.st-end{margin:0;max-width:30ch;text-align:center;font:italic 400 clamp(16px,4.4vw,19px)/1.45 'Playfair Display',Georgia,serif;color:#7A3A3A;opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .8s ease}
+.st-end.on{opacity:1;transform:none}
+html[lang="hi"] .st-end,html[lang="mr"] .st-end{font-family:'Tiro Devanagari Hindi','Mukta',serif;font-style:normal}
+.b-stick{gap:12px}
+.b-cap{height:84px}
+#story{padding-bottom:0!important}
+/* garlands open straight onto Day One (haldi) */
+.mg-bg{background:#F3D9A8!important;overflow:hidden}
+.mg-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 100%;transform:scale(1.28);transform-origin:50% 88%}
+#events{padding-top:0!important}
+#events > div:nth-child(3) > div:first-child{display:none!important}
+[data-haldi]{margin-top:0!important}
+.mg-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(58,13,22,.35) 0%,rgba(58,13,22,0) 16%,rgba(58,13,22,0) 78%,#3A0D16 100%)}
+/* haldi pins underneath the garlands, so the hand-off is the same photo, not a second copy */
+.mg{z-index:3!important;margin-bottom:-100vh;margin-bottom:-100svh}
+
+/* v2 hand-off: haldi is pinned underneath while the garlands fully cover the screen, so there is only ever one photo */
+.mg{background:transparent!important;margin-bottom:-168vh;margin-bottom:-168svh}
+.mg-bg{background:#E8D6B6!important;opacity:1}
+.mg-bg::after{display:none}
+/* caption box holds the closing line in the same spot, so nothing reserves extra space */
+.b-cap{height:118px!important}
+.st-end{position:absolute;left:0;right:0;top:0;margin:0 auto}
+.b-c.on~.st-end{opacity:0}
+.b-sign{height:50px!important;top:-44px!important}
+.b-sign span{font-size:12px!important}
+/* ===== Photo booth v3: painted booth, six photos print out of the slot one by one ===== */
+.b-wrap{height:430vh;height:430svh}
+.b-stick{gap:0!important;justify-content:center}
+.bx{position:relative;width:min(64vw,280px);aspect-ratio:736/788;flex:none}
+.bx-img{display:block;width:100%;height:100%;filter:drop-shadow(0 18px 22px rgba(60,10,20,.28))}
+.bx-flash{position:absolute;left:31%;right:31%;top:22%;bottom:16%;background:radial-gradient(ellipse at 50% 40%,#FFFDF4,rgba(255,248,224,.6) 50%,transparent 75%);opacity:0;pointer-events:none;mix-blend-mode:screen}
+.bx-slot{width:min(40vw,176px);height:8px;margin-top:6px;border-radius:5px;flex:none;position:relative;z-index:2;
+  background:linear-gradient(#5A1220,#1E060B);box-shadow:0 0 0 2px #C9A24E,0 3px 6px rgba(0,0,0,.35)}
+.bx-win{position:relative;width:min(36vw,160px);height:min(30svh,236px);overflow:hidden;flex:none;margin-top:-4px;
+  -webkit-mask:linear-gradient(#000 70%,transparent);mask:linear-gradient(#000 70%,transparent)}
+.bx-win .b-strip{position:absolute;left:0;right:0;top:0;background:#FBF5E8;padding:6px 6px 0;display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 8px 16px -8px rgba(0,0,0,.55);transform:translateY(-100%);transition:none!important}
+.bx-win .b-shot{aspect-ratio:4/5;background:#E9DFCC;overflow:hidden;position:relative}
+.bx-win .b-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:var(--dev,0);
+  filter:sepia(calc(.85 - var(--dev,0)*.75)) brightness(calc(1.7 - var(--dev,0)*.7)) contrast(1.02)}
+.bx-win .b-mono{margin:0;padding:4px 0 8px;text-align:center;font-family:'Pinyon Script',cursive;font-size:18px;color:#7A1E2A;line-height:1}
+.b-cap{margin-top:14px}
+@media (max-height:700px){.bx{width:min(44vw,210px)}.bx-win{height:26svh}}
+
+
+/* v4: photos are taken inside the booth, step forward to be seen, then slip away */
+.bx{width:min(80vw,340px)!important}
+.bx-ph{position:absolute;left:39.5%;right:38.5%;top:23%;bottom:24%;z-index:3;pointer-events:none}
+.bx-p{position:absolute;inset:0;margin:0;padding:4% 4% 13%;background:#FFF8EC;box-shadow:0 14px 26px -12px rgba(30,5,10,.7);opacity:0;transform-origin:50% 50%;will-change:transform,opacity}
+.bx-p img{display:block;width:100%;height:100%;object-fit:cover;filter:sepia(calc(.85 - var(--dev,0)*.8)) brightness(calc(1.6 - var(--dev,0)*.6))}
+.bx-flash{z-index:4}
+.b-cap{margin-top:22px!important}
+/* v5: tall painted booth that fits a phone; each photo is taken in the window, then drops into the print slot */
+.bx{width:auto!important;height:min(60vh,560px);height:min(60svh,560px);aspect-ratio:564/1294!important;max-width:80vw}
+.bx-ph{left:23%!important;right:23%!important;top:24.6%!important;bottom:37.7%!important;overflow:visible}
+.bx-flash{left:23%!important;right:23%!important;top:24.6%!important;bottom:37.7%!important}
+.bx-p{padding:0!important;background:#2A0A10!important;box-shadow:inset 0 0 0 1px rgba(201,162,78,.5),0 6px 14px -6px rgba(0,0,0,.6)!important}
+.bx-p img{width:100%;height:100%}
+.bx{height:min(64vh,600px);height:min(64svh,600px)}
+.bx-ph,.bx-flash{top:26.2%!important}
+/* no frame around Ganesh ji */
+.eg > div[style*="inset"][style*="border"]{display:none!important}
+
+/* v6: small whole prints (nothing cropped), soft fades, one warm film look on every photo, no chapter numbers */
+.bx-ph{display:flex;align-items:center;justify-content:center}
+.bx-p{inset:auto!important;position:absolute;left:14%!important;right:14%!important;top:50%!important;margin-top:0;aspect-ratio:3/4.45;height:auto!important;
+  padding:5% 5% 16%!important;background:#FBF4E6!important;box-shadow:0 10px 20px -10px rgba(20,4,8,.75)!important;translate:0 -50%}
+.bx-p img{height:auto!important;aspect-ratio:3/4;object-fit:cover;filter:sepia(.22) saturate(.82) contrast(1.06) brightness(1.03)!important}
+.bx-p::after{content:"";position:absolute;left:5%;right:5%;top:3.4%;aspect-ratio:3/4;background:linear-gradient(160deg,rgba(255,214,150,.16),rgba(120,40,30,.12));mix-blend-mode:soft-light;pointer-events:none}
+.bx-flash{display:none!important}
+.b-ck{display:none!important}
+.b-cap{height:96px!important}
+
+/* names: no ampersand in Hindi and Marathi */
+html[lang="hi"] .name-amp,html[lang="mr"] .name-amp{visibility:hidden;height:14px;overflow:hidden}
+/* Our Story heading in Hindi/Marathi: calm serif instead of the brush font */
+html[lang="hi"] .st-h,html[lang="mr"] .st-h{font-family:'Tiro Devanagari Hindi','Martel',serif!important;font-style:normal;font-weight:400;font-size:clamp(40px,11.5cqw,54px);line-height:1.25;margin:12px 0 18px}
+html[lang="hi"] .st-k,html[lang="mr"] .st-k{font-family:'Mukta',sans-serif;font-size:15px;font-weight:500;color:#9A2418;display:inline-flex;align-items:center;gap:12px}
+.st-k::before,.st-k::after{content:"";width:28px;height:1px;background:rgba(154,36,24,.4)}
+.st-k{display:inline-flex!important;align-items:center;gap:12px}
+/* closing line: its own quiet moment after the booth */
+.st-close{padding:40px 8px 70vh;padding-bottom:70svh;text-align:center}
+.st-close .st-orn{margin:0 auto 22px}
+.st-cl{margin:0 auto;max-width:28ch;font:italic 400 clamp(22px,6vw,28px)/1.45 'Playfair Display',Georgia,serif;color:#5A1422;text-wrap:balance}
+html[lang="hi"] .st-cl,html[lang="mr"] .st-cl{font-family:'Tiro Devanagari Hindi','Mukta',serif;font-style:normal;font-size:clamp(20px,5.6vw,25px);line-height:1.7}
+/* booth: photo-booth strips hang inside the window, three photos each */
+.bx-p{display:none!important}
+.bx-ph{overflow:hidden!important;display:block!important}
+.bx-strip{position:absolute;top:5%;left:50%;width:44%;margin-left:-22%;padding:5% 4.5% 3%;background:#FBF4E6;display:flex;flex-direction:column;gap:3.5%;box-shadow:0 10px 18px -8px rgba(0,0,0,.7);will-change:transform,opacity}
+.bx-f{margin:0;aspect-ratio:3/4;background:#E7DCC7;overflow:hidden;position:relative}
+.bx-f img{display:block;width:100%;height:100%;object-fit:cover;opacity:var(--dev,0);filter:sepia(calc(.22 + (1 - var(--dev,0))*.6)) saturate(.82) contrast(1.06) brightness(calc(1.03 + (1 - var(--dev,0))*.35))}
+.bx-mono{margin:2px 0 0;text-align:center;font-family:'Pinyon Script',cursive;font-size:13px;line-height:1.1;color:#7A1E2A}
+.bx-mono i{font-style:normal;color:#B5223A}
+.bx{height:min(70vh,640px)!important;height:min(70svh,640px)!important}
+.b-wrap{height:400vh!important;height:400svh!important}
+.bx-strip{width:50%;margin-left:-25%}
+.st-close{padding-bottom:54vh;padding-bottom:54svh}
+/* schedule: just the ritual names, no explanations */
+[data-t="r1s"],[data-t="r2s"],[data-t="r3s"]{display:none!important}
+html[lang="en"] .card-shubh{display:none!important}
+
+/* strips feed down out of a slot at the top of the window, first photo leading */
+.bx-strip{top:0!important;padding:3% 4.5% 5%!important;transform:translateY(-110%)}
+.bx-mono{margin:0 0 2px!important}
+.bx-feed{position:absolute;left:22%;right:22%;top:0;height:7px;z-index:5;border-radius:0 0 4px 4px;
+  background:linear-gradient(#1A0509,#3A0D16);box-shadow:0 0 0 1.5px #C9A24E,0 3px 6px rgba(0,0,0,.6)}
+
+/* each print, once out, is held up big in front of the booth so you can see it */
+.bx-big{position:absolute;z-index:8;left:50%;top:42%;width:min(66vw,280px);margin:0;padding:3.5% 3.5% 11%;background:#FBF4E6;
+  box-shadow:0 24px 40px -18px rgba(30,5,10,.75);opacity:0;transform:translate(-50%,-50%) scale(.3);pointer-events:none;will-change:transform,opacity}
+.bx-big img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;filter:sepia(.22) saturate(.82) contrast(1.06) brightness(1.03)}
+/* bride's side, third photo: wide crop so the whole family fits */
+.th-pol[data-s="bride"][data-n="2"] img{aspect-ratio:693/575!important}
+/* "Now, one family" sits under the title where the side tags were, so it is never pushed off screen */
+.th-one{bottom:auto!important;top:32%!important}
+/* garlands start falling while the closing line is still on screen: no empty gap */
+.mg{margin-top:-100vh!important;margin-top:-100svh!important}
+.st-close{padding-bottom:14vh!important;padding-bottom:14svh!important}
+.mg{height:285vh!important;height:285svh!important;margin-bottom:-185vh!important;margin-bottom:-185svh!important}
