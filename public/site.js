@@ -301,58 +301,59 @@
     o.observe(row);
   })();
 
-  /* ---------------- Our Story photo booth: strips feed down out of the booth's slot, one photo per scroll step ---------------- */
+  /* ---------------- Our Story photo booth: one strip of six feeds down out of the booth's slot ---------------- */
   (function () {
     var wrap = document.querySelector('.b-wrap'); if (!wrap) return;
-    var box = wrap.querySelector('.bx-ph');
-    var strips = [].slice.call(wrap.querySelectorAll('.bx-strip'));
+    var st = wrap.querySelector('.bx-strip'), mono = st && st.querySelector('.bx-mono');
+    var figs = [].slice.call(wrap.querySelectorAll('.bx-f')).sort(function (a, b) { return a.dataset.i - b.dataset.i; });
     var caps = [].slice.call(document.querySelectorAll('.b-c'));
-    var tk = false, big = wrap.querySelector('.bx-big'), bigImg = big && big.querySelector('img'), shownSrc = '';
+    var big = wrap.querySelector('.bx-big'), bigImg = big && big.querySelector('img'), full = wrap.querySelector('.bx-full');
     var srcs = [1, 2, 3, 4, 5, 6].map(function (n) { return 'photos/story-' + n + '.webp'; });
+    var N = 6, END = 7.2, shownSrc = '', tk = false;
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function eio(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
-    // 0..3 photos out, easing out each photo and then holding while you read
-    function fed(v) { v = Math.max(0, Math.min(3, v)); var k = Math.floor(v), f = v - k; return Math.min(3, k + eio(c01(f / 0.6))); }
+    function fed(v) { v = Math.max(0, Math.min(N, v)); var k = Math.floor(v), f = v - k; return Math.min(N, k + eio(c01(f / 0.55))); }
     function upd() {
       tk = false;
       var r = wrap.getBoundingClientRect(), span = wrap.offsetHeight - window.innerHeight;
       var p = reduce ? 1 : c01(-r.top / Math.max(1, span));
-      var seg = p * 6.6, bh = box.offsetHeight;
-      var cur = -1;
-      strips.forEach(function (st, si) {
-        var figs = [].slice.call(st.querySelectorAll('.bx-f')).reverse();   // first photo is the leading (bottom) frame
-        var mono = st.querySelector('.bx-mono');
-        var H = st.offsetHeight, fh = figs[0].offsetHeight, gap = (H - (mono ? mono.offsetHeight : 0) - fh * 3) / 4;
-        var local = seg - si * 3.5, out = fed(local);
-        // bottom edge of the strip sits `shown` px below the slot
-        var shown = out * (fh + gap) + (out >= 3 ? c01((local - 3) / 0.25) * ((mono ? mono.offsetHeight : 0) + gap) : 0);
-        var y = shown - H;
-        var o = 1;
-        if (si === 0) { var drop = eio(c01((seg - 3.2) / 0.4)); y += drop * bh; o = 1 - drop; }   // first strip falls away
-        if (si === 1 && local < 0) o = 0;
-        st.style.transform = 'translateY(' + y.toFixed(1) + 'px)';
-        st.style.opacity = o.toFixed(3);
-        figs.forEach(function (f, i) {
-          var d = reduce ? 1 : c01((out - i - 0.15) / 0.85);
-          f.style.setProperty('--dev', d.toFixed(3));
-          if (local >= i + 0.05 && local < 3.5) cur = si * 3 + i;
-        });
-      });
-      if (seg >= 6.6 - 0.01) cur = 5;
-      // hold the newest print up big: it lifts out once it has fed, then tucks back before the next one
-      if (big) {
-        var bi = -1, bt = 0;
-        for (var k = 0; k < 6; k++) {
-          var si2 = k < 3 ? 0 : 1, t = seg - si2 * 3.5 - (k % 3), end = (k % 3 === 2) ? (k === 5 ? 99 : 1.25) : 1;
-          if (t >= 0.5 && t < end) { bi = k; bt = t; }
-        }
-        var v = 0;
-        if (bi >= 0) { var inn = eio(c01((bt - 0.5) / 0.18)), outE = bi === 5 ? 0 : eio(c01((bt - (bi % 3 === 2 ? 1.08 : 0.86)) / 0.14)); v = inn * (1 - outE); if (shownSrc !== srcs[bi]) { shownSrc = srcs[bi]; bigImg.src = shownSrc; } }
-        if (reduce) v = bi >= 0 ? 1 : 0;
-        big.style.opacity = v.toFixed(3);
-        big.style.transform = 'translate(-50%,-50%) scale(' + (0.3 + 0.7 * v).toFixed(3) + ') rotate(' + ((bi % 2 ? 2 : -2) * v).toFixed(2) + 'deg)';
+      var seg = p * END, out = fed(seg);
+      // feed: the first photo leads out of the slot; older photos slide on down past the window
+      if (st) {
+        var fh = figs[0].offsetHeight, gap = parseFloat(getComputedStyle(st).rowGap) || 4, H = st.offsetHeight;
+        var shown = out * (fh + gap) + c01((seg - N) / 0.3) * ((mono ? mono.offsetHeight : 0) + gap);
+        st.style.transform = 'translateY(' + (shown - H).toFixed(1) + 'px)';
       }
-      caps.forEach(function (c, i) { c.classList.toggle('on', i === cur); });
+      var cur = -1;
+      figs.forEach(function (f, i) {
+        f.style.setProperty('--dev', (reduce ? 1 : c01((out - i - 0.1) / 0.9)).toFixed(3));
+        if (seg >= i + 0.05) cur = i;
+      });
+      caps.forEach(function (c, i) { c.classList.toggle('on', i === Math.min(cur, N - 1)); });
+      // each print grows out of its own frame, is held up big, then settles back in
+      if (big) {
+        var bi = Math.floor(seg), bt = seg - bi, v = 0;
+        if (bi >= 0 && bi < N) {
+          v = eio(c01((bt - 0.58) / 0.22)) * (1 - eio(c01((bt - 0.86) / 0.14)));
+          if (shownSrc !== srcs[bi]) { shownSrc = srcs[bi]; bigImg.src = shownSrc; }
+        }
+        if (reduce) v = 0;
+        var tx = 0, ty = 0, s0 = 0.3, frm = figs[bi], bx = big.parentNode;
+        if (frm && bx) {
+          var fr = frm.getBoundingClientRect(), br = bx.getBoundingClientRect(), bw = big.offsetWidth || 1;
+          tx = (fr.left + fr.width / 2) - (br.left + br.width * 0.5);
+          ty = (fr.top + fr.height / 2) - (br.top + br.height * 0.42);
+          s0 = fr.width / (bw * 0.93);
+        }
+        big.style.opacity = c01(v / 0.18).toFixed(3);
+        big.style.transform = 'translate(calc(-50% + ' + (tx * (1 - v)).toFixed(1) + 'px), calc(-50% + ' + (ty * (1 - v)).toFixed(1) + 'px)) scale(' + (s0 + (1 - s0) * v).toFixed(3) + ') rotate(' + ((bi % 2 ? 2 : -2) * v).toFixed(2) + 'deg)';
+      }
+      // finale: the finished strip of all six is lifted out and shown whole
+      if (full) {
+        var fv = reduce ? 1 : eio(c01((seg - 6.25) / 0.6));
+        full.style.opacity = c01(fv / 0.25).toFixed(3);
+        full.style.transform = 'translate(-50%,-50%) translateY(' + (30 * (1 - fv)).toFixed(1) + '%) scale(' + (0.55 + 0.45 * fv).toFixed(3) + ') rotate(' + (-3 * fv).toFixed(2) + 'deg)';
+      }
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
     window.addEventListener('resize', upd);
@@ -379,20 +380,42 @@
     });
     g += '<circle r="5" fill="#C9700C"/></symbol>';
     defs.innerHTML = g; document.body.appendChild(defs);
-    var strands = [];
+    var strands = [], flower = null;
+    // draw the marigold once into a bitmap, then paint each garland as ONE pre-rendered image (no per-flower DOM)
+    (function () {
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-50 -50 100 100">' + defs.innerHTML.replace('<symbol id="mgf" viewBox="-50 -50 100 100">', '<g>').replace('</symbol>', '</g>') + '</svg>';
+      var im = new Image();
+      im.onload = function () { flower = im; build(); };
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    })();
+    function tile(fs, seed) {
+      var dpr = Math.min(2, window.devicePixelRatio || 1), step = fs * 0.62, n = 9, w = Math.ceil(fs * 1.1), h = Math.ceil(step * n);
+      var cv = document.createElement('canvas'); cv.width = w * dpr; cv.height = h * dpr;
+      var x = cv.getContext('2d'); x.scale(dpr, dpr);
+      x.strokeStyle = 'rgba(120,70,20,.5)'; x.lineWidth = 1; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.stroke();
+      x.shadowColor = 'rgba(60,20,0,.35)'; x.shadowBlur = 4; x.shadowOffsetY = 3;
+      for (var k = -1; k <= n; k++) {
+        var cy = k * step + step / 2, sc = 0.92 + ((k + seed + 9) % 3) * 0.05, s = fs * sc;
+        x.save(); x.translate(w / 2, cy); x.rotate(((k * 47 + seed * 23) % 360) * Math.PI / 180);
+        x.drawImage(flower, -s / 2, -s / 2, s, s); x.restore();
+        var q = ((k + 9) + seed * 3) % 9;
+        if (q === 4) { var g = x.createRadialGradient(w / 2 - 2, cy + step / 2 - 2, 1, w / 2, cy + step / 2, fs * 0.13); g.addColorStop(0, '#FFD9DF'); g.addColorStop(0.6, '#C2183A'); g.addColorStop(1, '#7A0A20'); x.fillStyle = g; x.beginPath(); x.arc(w / 2, cy + step / 2, fs * 0.12, 0, 7); x.fill(); }
+        else if (q === 8) { x.fillStyle = '#4E7A2C'; x.beginPath(); x.ellipse(w / 2 + fs * 0.12, cy + step / 2, fs * 0.24, fs * 0.09, -0.5, 0, 7); x.fill(); }
+      }
+      return { url: cv.toDataURL('image/png'), w: w, h: h };
+    }
     function build() {
+      if (!flower) return;
       box.innerHTML = ''; strands = [];
       var W = box.clientWidth, H = box.clientHeight;
-      var cols = W < 600 ? 9 : 15, w = W / cols, fs = w * 1.25, per = Math.ceil(H / (fs * 0.62)) + 2;
+      var cols = W < 600 ? 9 : 15, w = W / cols, fs = w * 1.25;
+      var tiles = [tile(fs, 0), tile(fs, 1), tile(fs, 2)];
       for (var c = 0; c < cols; c++) {
-        var s = document.createElement('div'); s.className = 'mg-s';
-        s.style.left = (c * w + w / 2 - fs / 2).toFixed(1) + 'px'; s.style.width = fs.toFixed(1) + 'px';
-        var h = '';
-        for (var k = 0; k < per; k++) {
-          h += '<svg viewBox="-50 -50 100 100" width="' + fs.toFixed(1) + '" height="' + fs.toFixed(1) + '" style="margin:' + (-fs * 0.19).toFixed(1) + 'px 0;transform:rotate(' + ((k * 47 + c * 23) % 360) + 'deg) scale(' + (0.92 + ((k + c) % 3) * 0.05) + ')"><use href="#mgf" x="-50" y="-50" width="100" height="100"/></svg>';
-          var q = (k + c * 3) % 9; if (q === 4) h += '<i class="bd"></i>'; else if (q === 8) h += '<i class="lf"></i>';
-        }
-        s.innerHTML = h; s.style.marginTop = (-((c * 37) % 60)).toFixed(0) + 'px'; box.appendChild(s);
+        var t = tiles[c % 3], s = document.createElement('div'); s.className = 'mg-s';
+        s.style.left = (c * w + w / 2 - t.w / 2).toFixed(1) + 'px'; s.style.width = t.w + 'px'; s.style.height = (H + 80) + 'px';
+        s.style.backgroundImage = 'url(' + t.url + ')'; s.style.backgroundSize = t.w + 'px ' + t.h + 'px';
+        s.style.backgroundPosition = '0 ' + (-((c * 37) % 60)) + 'px';
+        box.appendChild(s);
         strands.push({ el: s, c: c, mid: (c + 0.5) / cols - 0.5, d: Math.abs((c + 0.5) / cols - 0.5) });
       }
       upd();
@@ -419,8 +442,7 @@
       });
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
-    var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(build, 200); });
-    build();
+    var rt, lw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === lw) return; lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(build, 200); });
   })();
 
   /* ---------------- petals ---------------- */

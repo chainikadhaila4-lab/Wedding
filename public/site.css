@@ -553,3 +553,34 @@ html[lang="en"] .card-shubh{display:none!important}
 .mg{margin-top:-100vh!important;margin-top:-100svh!important}
 .st-close{padding-bottom:14vh!important;padding-bottom:14svh!important}
 .mg{height:285vh!important;height:285svh!important;margin-bottom:-185vh!important;margin-bottom:-185svh!important}
+
+/* garlands are single painted images now: cheap to move */
+.mg-s{background-repeat:repeat-y;transform:translateY(-110%);will-change:transform;contain:strict}
+.mg-s::before{display:none}
+
+.bx-big{transition:none!important}
+/* closing line gets a whole slide of its own */
+.st-close{min-height:100vh;min-height:100svh;padding:40px 18px!important;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.st-cl{font-size:clamp(30px,8vw,42px)!important;line-height:1.38!important;max-width:16ch!important}
+html[lang="hi"] .st-cl,html[lang="mr"] .st-cl{font-size:clamp(26px,7vw,36px)!important;line-height:1.65!important;max-width:18ch!important}
+.mg{margin-top:-60vh!important;margin-top:-60svh!important}
+
+/* one strip of six; the finale shows the whole strip */
+.bx-strip{gap:4px!important;width:46%!important;margin-left:-23%!important}
+.bx-full{position:absolute;z-index:9;left:50%;top:46%;height:min(78vh,92%);height:min(78svh,620px);aspect-ratio:1/4.3;padding:2.5% 4% 0;background:#FBF4E6;
+  display:flex;flex-direction:column;gap:1.2%;box-shadow:0 28px 46px -20px rgba(30,5,10,.8);opacity:0;transform:translate(-50%,-50%) scale(.55);pointer-events:none}
+.bx-full i{display:block;flex:1;min-height:0;overflow:hidden}
+.bx-full img{display:block;width:100%;height:100%;object-fit:cover;filter:sepia(.22) saturate(.82) contrast(1.06) brightness(1.03)}
+.bx-full .bx-mono{font-size:18px!important;padding:4px 0 6px;margin:0!important}
+.b-wrap{height:520vh!important;height:520svh!important}
+/* Hindi/Marathi on phones: smaller event headings and dates so each block fits on screen */
+@media (max-width:600px){
+  html[lang="hi"] [data-haldi] h3,html[lang="mr"] [data-haldi] h3,html[lang="hi"] [data-wedding] h3,html[lang="mr"] [data-wedding] h3{font-size:clamp(28px,8.4vw,36px)!important;line-height:1.25!important}
+  html[lang="hi"] [data-haldi] [style*="font-size: 96px"],html[lang="mr"] [data-haldi] [style*="font-size: 96px"],html[lang="hi"] [data-wedding] [style*="font-size: 96px"],html[lang="mr"] [data-wedding] [style*="font-size: 96px"]{font-size:72px!important}
+  html[lang="hi"] [data-haldi] > div > div:last-child,html[lang="mr"] [data-haldi] > div > div:last-child,html[lang="hi"] [data-wedding] > div > div:last-child,html[lang="mr"] [data-wedding] > div > div:last-child{top:108px!important}
+  html[lang="hi"] body,html[lang="mr"] body{overflow-wrap:break-word}
+}
+/* finale strip tidy-up */
+.bx-full{height:min(66vh,560px)!important;height:min(66svh,560px)!important;top:44%!important}
+.bx-full .bx-mono{white-space:nowrap;font-size:15px!important}
+.st-cl{max-width:20ch!important;font-size:clamp(26px,7vw,36px)!important}
