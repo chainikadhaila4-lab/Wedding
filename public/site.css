@@ -771,3 +771,86 @@ html{scroll-snap-type:y proximity}
 [data-k="envsec"],[data-k="loader"]{top:0!important;bottom:0!important;height:auto!important;min-height:100vh;min-height:100lvh}
 [data-k="env"]{inset:0!important;min-height:100%}
 body.locked:not(.diving) #app>section:not([data-k]),body.locked:not(.diving) #app>footer,body.locked:not(.diving) #petals{visibility:hidden}
+
+/* phones: haldi & wedding photos zoom out smoothly once when the scene arrives */
+@media (pointer:coarse){
+  [data-hz],[data-wz]{transform:scale(1.28)!important;transform-origin:50% 88%;transition:transform 3.2s cubic-bezier(.25,.6,.25,1)!important;will-change:transform}
+  .zin [data-hz],.zin [data-wz]{transform:scale(1)!important}
+}
+
+/* ===== booth and marigolds removed: Our Story is four simple polaroids, nothing pinned or snapping ===== */
+html{scroll-snap-type:none!important}
+.sp-list{display:flex;flex-direction:column;align-items:center;gap:30px;margin:26px 0 10px;width:100%}
+.sp-pol{margin:0;width:82%;max-width:330px;padding:10px 10px 16px;background:#FFF9EF;box-shadow:0 16px 28px -16px rgba(60,14,20,.55);transform:rotate(-1.5deg)}
+.sp-pol.r{transform:rotate(1.5deg)}
+.sp-pol img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;filter:sepia(.18) saturate(.88) contrast(1.04)}
+.sp-pol figcaption{margin-top:12px;text-align:center;font:italic 400 clamp(18px,5vw,21px)/1.35 'Playfair Display',Georgia,serif;color:#7A1E2A}
+html[lang="hi"] .sp-pol figcaption,html[lang="mr"] .sp-pol figcaption{font:400 18px/1.6 'Tiro Devanagari Hindi','Mukta',serif}
+.st-close{min-height:0!important;padding:30px 18px 60px!important}
+/* ===== Our Story: storybook pages (scroll down, no swipe) ===== */
+.sp-list{counter-reset:pg;gap:34px!important;margin:30px 0 16px!important}
+.sp-pol,.sp-pol.r{counter-increment:pg;position:relative;width:88%!important;max-width:380px!important;padding:30px 22px 22px!important;
+  background:#FBF3E4 repeating-linear-gradient(180deg,transparent 0 31px,rgba(122,30,42,.07) 31px 32px)!important;
+  border:1px solid rgba(184,134,11,.28);border-radius:3px 10px 10px 3px;
+  box-shadow:inset 14px 0 18px -14px rgba(90,40,20,.35),0 1px 0 #EFE2C8,0 3px 0 #F6ECD9,0 4px 0 #E6D6B6,0 18px 30px -18px rgba(60,14,20,.55)!important;
+  transform:rotate(-.8deg)!important}
+.sp-pol.r{transform:rotate(.8deg)!important;border-radius:10px 3px 3px 10px;box-shadow:inset -14px 0 18px -14px rgba(90,40,20,.35),0 1px 0 #EFE2C8,0 3px 0 #F6ECD9,0 4px 0 #E6D6B6,0 18px 30px -18px rgba(60,14,20,.55)!important}
+.sp-pol img{border:7px solid #fff;box-shadow:0 8px 16px -10px rgba(60,14,20,.6);transform:rotate(1.4deg);width:100%}
+.sp-pol.r img{transform:rotate(-1.4deg)}
+.sp-pol::before,.sp-pol::after{content:"";position:absolute;z-index:2;width:92px;height:24px;top:18px;opacity:.88;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#E7B7A3;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sp-pol::before{left:6px;transform:rotate(-32deg)}
+.sp-pol::after{right:6px;transform:rotate(30deg);background:repeating-linear-gradient(-45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#D9A441}
+.sp-pol:nth-child(2)::before{background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#B8C99A}
+.sp-pol:nth-child(3)::after{background:repeating-linear-gradient(-45deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px),#C98B97}
+.sp-pol figcaption{margin-top:18px!important;padding:0 6px 30px;position:relative;font:400 clamp(17px,4.8vw,20px)/1.55 'Amita','Playfair Display',Georgia,serif!important;color:#7A1E2A!important}
+html[lang="hi"] .sp-pol figcaption,html[lang="mr"] .sp-pol figcaption{font:400 clamp(17px,4.8vw,20px)/1.7 'Amita','Tiro Devanagari Hindi',serif!important}
+.sp-pol figcaption::after{content:"— " counter(pg,lower-roman) " —";position:absolute;left:0;right:0;bottom:0;font:italic 400 14px/1 'Cormorant Garamond',Georgia,serif;letter-spacing:.12em;color:#B8860B}
+.sp-pol figcaption::before{content:"";position:absolute;width:30px;height:30px;right:-6px;bottom:-4px;opacity:.75;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23B8860B' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M16 27s-10-6.2-10-13a5.5 5.5 0 0 1 10-3.2A5.5 5.5 0 0 1 26 14c0 6.8-10 13-10 13z'/%3E%3C/svg%3E")}
+.sp-pol:nth-child(2) figcaption::before{left:-6px;right:auto;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23B8860B' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M16 4l3.2 7.6 8.2.7-6.2 5.4 1.9 8-7.1-4.3-7.1 4.3 1.9-8-6.2-5.4 8.2-.7z'/%3E%3C/svg%3E")}
+.sp-pol:nth-child(3) figcaption::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23B8860B' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M6 26C10 14 18 8 27 6c-2 9-8 17-21 20zM6 26l11-11'/%3E%3C/svg%3E")}
+.sp-pol:nth-child(4) figcaption::before{left:-6px;right:auto;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23B8860B' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M12 20s-7-4.3-7-9a3.8 3.8 0 0 1 7-2.2A3.8 3.8 0 0 1 19 11c0 4.7-7 9-7 9zM22 26s-5-3-5-6.4a2.7 2.7 0 0 1 5-1.6 2.7 2.7 0 0 1 5 1.6C27 23 22 26 22 26z'/%3E%3C/svg%3E")}
+/* storybook: sideways pages on phones (native swipe, no JS) */
+@media (pointer:coarse){
+.sp-list{flex-direction:row!important;align-items:stretch!important;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;gap:14px!important;padding:18px 9vw 26px!important;margin:24px -18px 6px!important;width:calc(100% + 36px)!important;box-sizing:border-box}
+.sp-list::-webkit-scrollbar{display:none}
+.sp-pol,.sp-pol.r{flex:0 0 82vw!important;width:82vw!important;max-width:360px!important;scroll-snap-align:center;scroll-snap-stop:always;transform:none!important;opacity:1!important}
+.sp-hint{display:block!important}
+}
+.sp-hint{display:none;text-align:center;margin:0 0 6px;font:italic 400 15px/1 'Cormorant Garamond',Georgia,serif;letter-spacing:.14em;color:#B8860B}
+/* ===== storybook (phones): book opens and pages turn as you scroll ===== */
+.sb-wrap{display:none}
+@media (pointer:coarse){
+.has-book .sp-list,.has-book .sp-hint{display:none!important}
+.has-book .sb-wrap{display:block;position:relative;margin:10px -18px 0}
+.sb-stick{position:-webkit-sticky;position:sticky;top:0;height:100vh;height:100svh;padding-top:88px;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.sb-book{position:relative;width:min(80vw,340px,calc((100svh - 170px)*.625));aspect-ratio:5/8;perspective:1800px;counter-reset:pg;
+  filter:drop-shadow(0 22px 26px rgba(60,14,20,.35))}
+.sb-book::before{content:"";position:absolute;inset:4px -5px -6px 4px;background:#EADBC0;border-radius:4px 10px 10px 4px;box-shadow:inset -1px 0 0 #D9C59F,2px 2px 0 #F3E8D2,4px 4px 0 #E2D0AE}
+.sb-leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:0 50%;transform:rotateY(0deg);
+  transition:transform 1.1s cubic-bezier(.55,.08,.3,1),opacity .2s;will-change:transform}
+.sb-leaf.turned{transform:rotateY(-175deg);opacity:0;transition:transform 1.1s cubic-bezier(.55,.08,.3,1),opacity .35s .8s}
+.sb-face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:3px 10px 10px 3px;overflow:visible}
+.sb-back{transform:rotateY(180deg);background:#F6EDDC repeating-linear-gradient(180deg,transparent 0 31px,rgba(122,30,42,.06) 31px 32px);border-radius:10px 3px 3px 10px;box-shadow:inset -16px 0 20px -14px rgba(90,40,20,.35)}
+.sb-front.sp-pol{width:auto!important;max-width:none!important;margin:0!important;transform:none!important;opacity:1!important;display:flex;flex-direction:column;box-sizing:border-box;padding:28px 20px 16px!important}
+.sb-front.sp-pol img{flex:1 1 auto;height:0;min-height:0;aspect-ratio:auto!important;object-fit:cover;width:100%;box-sizing:border-box}
+.sb-front.sp-pol figcaption,.sb-front.sp-pol span{flex:0 0 auto}
+.sb-front.sp-pol > span{display:block;margin-top:14px;padding:0 6px 28px;position:relative;text-align:center;font:400 clamp(16px,4.6vw,19px)/1.45 'Amita','Playfair Display',Georgia,serif;color:#7A1E2A}
+.sb-cover{background:radial-gradient(120% 80% at 50% 35%,#6A1626 0%,#4A0F1C 60%,#330A13 100%);box-shadow:inset 6px 0 10px -4px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;border-radius:3px 12px 12px 3px}
+.sb-cv-in{position:absolute;inset:14px;border:1.5px solid rgba(217,164,65,.75);outline:1px solid rgba(217,164,65,.4);outline-offset:-7px;border-radius:2px 8px 8px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
+.sb-cv-in img{display:block!important;width:42%;max-width:130px;margin-bottom:18px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.sb-cv-t{margin:0;font:400 clamp(40px,12vw,54px)/1.1 'Pinyon Script',cursive;color:#E9C46A;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+html[lang="hi"] .sb-cv-t,html[lang="mr"] .sb-cv-t{font:400 clamp(30px,9vw,40px)/1.3 'Tiro Devanagari Hindi',serif}
+.sb-cv-h{margin:26px 0 0;font:500 11px/1.4 'Jost',sans-serif;letter-spacing:.28em;text-transform:uppercase;color:rgba(233,196,106,.8)}
+}
+/* section break: The Celebrations */
+#events > div:nth-child(3) > div:first-child{display:block!important;position:relative;text-align:center;padding:34px 10px 40px;margin:0 -18px 0;background:#F3EADB}
+#events > div:nth-child(3) > div:first-child::before{content:"";display:block;width:min(240px,70%);height:22px;margin:0 auto 16px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22' fill='none' stroke='%23B8860B' stroke-width='1.2'%3E%3Cpath d='M0 11h92M148 11h92'/%3E%3Cpath d='M120 3c-5 4-7 9-7 13 3 0 6-1 7-3 1 2 4 3 7 3 0-4-2-9-7-13z'/%3E%3Cpath d='M113 16c-5 0-10-3-12-7 5-1 9 0 12 3M127 16c5 0 10-3 12-7-5-1-9 0-12 3'/%3E%3Ccircle cx='96' cy='11' r='1.6' fill='%23B8860B'/%3E%3Ccircle cx='144' cy='11' r='1.6' fill='%23B8860B'/%3E%3C/svg%3E")}
+#events > div:nth-child(3) > div:first-child h2{margin:0!important;opacity:1!important;transform:none!important;font:400 clamp(40px,11vw,60px)/1.1 'Pinyon Script',cursive!important;color:#7A1E2A!important;letter-spacing:0!important;text-transform:none!important}
+html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] #events > div:nth-child(3) > div:first-child h2{font:400 clamp(30px,8vw,44px)/1.3 'Tiro Devanagari Hindi',serif!important}
+.cel-d{margin:12px 0 0!important;font:500 11px/1.5 'Jost',sans-serif!important;letter-spacing:.3em!important;color:#B8860B!important}
+#top > .tband,#top > .tcue{display:none!important}
+#events > div:nth-child(3) > div:first-child h2{font:italic 400 clamp(36px,10vw,54px)/1.15 'Playfair Display',Georgia,serif!important}
+/* let the Celebrations break flow into the card above and the haldi photo below */
+#events > div:nth-child(3) > div:first-child{background:linear-gradient(180deg,#E8E3DA 0%,#EFE4D3 45%,#E6D3B5 100%)!important;z-index:5;padding-bottom:30px!important}
+#events > div:nth-child(3) > div:first-child::after{content:"";position:absolute;left:0;right:0;top:100%;height:110px;pointer-events:none;background:linear-gradient(180deg,#E6D3B5 0%,rgba(230,211,181,.7) 35%,rgba(230,211,181,0) 100%)}

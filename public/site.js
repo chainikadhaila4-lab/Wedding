@@ -548,7 +548,7 @@
     var box = document.createElement('div');
     box.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,.82);color:#fff;font:12px/1.35 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;white-space:pre';
     document.body.appendChild(box);
-    var secs = [['two homes', '#homes'], ['card', '#top'], ['story', '#story'], ['haldi', '[data-haldi]'], ['wedding', '[data-wedding]'], ['venue', '#venue']];
+    var secs = [['two homes', '#homes'], ['card', '#top'], ['haldi', '[data-haldi]'], ['wedding', '[data-wedding]'], ['venue', '#venue']];
     var stats = {}, last = 0, lastY = window.scrollY, frames = 0, slow = 0, t0 = performance.now();
     function where() {
       var name = 'top', vh = window.innerHeight;
@@ -647,6 +647,8 @@
     var img = sec.querySelector(imgSel);
     if (TOUCH) {   // phones: no per-frame motion inside pinned scenes (it shakes on iPhone); text fades in with CSS instead
       var back = r.top > vh * 0.4;
+      // phones: the photo zooms out once as the scene settles (a smooth CSS move, not tied to every scroll step)
+      if (back) sec.classList.remove('zin'); else if (r.top < vh * 0.3) sec.classList.add('zin');
       sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) {
         if (back) el.classList.remove('t-in'); else if (reduce || p >= parseFloat(el.getAttribute(txtAttr))) el.classList.add('t-in');
       });
@@ -731,4 +733,43 @@
 
   /* ---------------- small touches ---------------- */
   var dir = app.querySelector('a[href*="maps.app.goo.gl"]'); if (dir) dir.classList.add('sheen');
+})();
+
+/* ---------------- Our Story as a book on phones: cover opens, one page turns per scroll step ---------------- */
+(function () {
+  if (!(window.matchMedia && matchMedia('(pointer: coarse)').matches)) return;
+  var list = document.querySelector('.sp-list'); if (!list) return;
+  var figs = [].slice.call(list.querySelectorAll('.sp-pol')); if (!figs.length) return;
+  var wrap = document.createElement('div'); wrap.className = 'sb-wrap';
+  var stick = document.createElement('div'); stick.className = 'sb-stick';
+  var book = document.createElement('div'); book.className = 'sb-book';
+  var leaves = [];
+  function leaf(frontHTML, frontCls) {
+    var l = document.createElement('div'); l.className = 'sb-leaf';
+    l.innerHTML = '<div class="sb-face sb-front ' + frontCls + '">' + frontHTML + '</div><div class="sb-face sb-back"></div>';
+    book.appendChild(l); leaves.push(l); return l;
+  }
+  leaf('<div class="sb-cv-in"><img src="assets/logo.png" alt=""><p class="sb-cv-t"><span data-t="storyTitle">Our Story</span></p><p class="sb-cv-h"><span data-t="sbHint">scroll to open</span> &darr;</p></div>', 'sb-cover');
+  figs.forEach(function (f) { leaf(f.innerHTML, 'sp-pol'); });
+  var n = leaves.length;
+  leaves.forEach(function (l, i) { l.style.zIndex = n - i; });
+  stick.appendChild(book); wrap.appendChild(stick);
+  list.parentNode.insertBefore(wrap, list);
+  var T = (window.DICT || {})[document.documentElement.lang] || {};
+  book.querySelectorAll('[data-t]').forEach(function (el) { var k = el.getAttribute('data-t'); if (T[k] != null) el.textContent = T[k]; });
+  document.documentElement.classList.add('has-book');
+  var steps = n - 1, cur = -1, ticking = false;
+  function upd() {
+    ticking = false;
+    var vh = window.innerHeight, top = wrap.getBoundingClientRect().top;
+    var s = Math.floor((-top) / (vh * 0.55) + 0.35);
+    s = Math.max(0, Math.min(steps, s));
+    if (s === cur) return; cur = s;
+    leaves.forEach(function (l, i) { l.classList.toggle('turned', i < s); });
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }
+  wrap.style.height = 'calc(100vh + ' + (steps * 55 + 25) + 'vh)';
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  upd();
 })();
