@@ -4,6 +4,8 @@
   var app = document.getElementById('app');
   var body = document.body;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (IOS) document.documentElement.classList.add('ios');
   var K = function (k) { return app.querySelector('[data-k="' + k + '"]'); };
   var EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
   var OUT = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
@@ -216,9 +218,20 @@
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
     var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    if (TCH) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
+    if (TCH || IOS) { TCH = true; sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
+    if (IOS) {   // iPhone: nothing pinned or tied to scrolling; the families arrive on a timer once the scene is on screen
+      var played = false;
+      var go = function () {
+        if (played) return; played = true;
+        tags.forEach(function (t) { t.classList.add('in'); });
+        pols.forEach(function (el) { var d = (el.dataset.s === 'bride' ? 0 : 900) + (+el.dataset.n) * 220; setTimeout(function () { el.classList.add('in'); }, 300 + d); });
+        setTimeout(function () { sec.classList.add('joined'); tags.forEach(function (t) { t.classList.remove('in'); }); }, 3300);
+      };
+      if ('IntersectionObserver' in window) { var io2 = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { go(); io2.disconnect(); } }, { threshold: 0.55 }); io2.observe(art); } else go();
+    }
     function upd() {
       tk = false;
+      if (IOS) return;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       var p = c01(-r.top / span);
@@ -582,7 +595,7 @@
   var colors = [['#FFB347','#E8731A'], ['#FFD25C','#F2A019'], ['#F28C28','#C8571B'], ['#E2557F','#A61E4D'], ['#FFFFFF','#EADBC8'], ['#F7A8C0','#D96A92']];
   function petals() {
     if (reduce) return;
-    var n = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? 12 : (window.innerWidth < 640 ? 30 : 44);
+    var n = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? (IOS ? 8 : 12) : (window.innerWidth < 640 ? 30 : 44);
     for (var i = 0; i < n; i++) {
       var p = document.createElement('span'); p.className = 'petal';
       var b = document.createElement('b'), depth = Math.random(), sz = 9 + depth * 14;
@@ -640,7 +653,7 @@
     return clamp(-r.top / Math.max(1, r.height - window.innerHeight));
   }
   function stickyScene(sec, imgSel, txtAttr) {
-    if (!sec) return;
+    if (!sec || IOS) return;
     var r = sec.getBoundingClientRect(), vh = window.innerHeight;
     if (r.bottom < -50 || r.top > vh + 50) return;
     var p = prog(sec);

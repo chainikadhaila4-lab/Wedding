@@ -854,3 +854,16 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
 /* let the Celebrations break flow into the card above and the haldi photo below */
 #events > div:nth-child(3) > div:first-child{background:linear-gradient(180deg,#E8E3DA 0%,#EFE4D3 45%,#E6D3B5 100%)!important;z-index:5;padding-bottom:30px!important}
 #events > div:nth-child(3) > div:first-child::after{content:"";position:absolute;left:0;right:0;top:100%;height:110px;pointer-events:none;background:linear-gradient(180deg,#E6D3B5 0%,rgba(230,211,181,.7) 35%,rgba(230,211,181,0) 100%)}
+/* no overlay on top of the pinned haldi photo (caused flicker on iPhone) */
+#events > div:nth-child(3) > div:first-child{z-index:auto!important;padding-bottom:40px!important}
+#events > div:nth-child(3) > div:first-child::after{content:none!important;display:none!important}
+/* ===== iPhone calm mode: nothing pinned, nothing zooming with the scroll ===== */
+html.ios [data-haldi],html.ios [data-wedding]{height:auto!important}
+html.ios [data-haldi] > div:first-child,html.ios [data-wedding] > div:first-child{position:relative!important;height:100vh!important;height:100svh!important}
+html.ios [data-hz],html.ios [data-wz]{transform:none!important;transition:none!important;will-change:auto!important}
+html.ios [data-ht],html.ios [data-wt]{opacity:1!important;transform:none!important;transition:none!important}
+html.ios #homes.th{height:auto!important}
+html.ios .th-stick{position:relative!important;height:100vh!important;height:100svh!important}
+html.ios .th-art{transform:none!important;will-change:auto!important}
+html.ios [data-flow]{transform:none!important;opacity:1!important}
+html.ios nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
