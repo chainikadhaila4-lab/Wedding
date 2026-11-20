@@ -650,3 +650,31 @@ html[lang="hi"] .pb-cv-t,html[lang="mr"] .pb-cv-t{font-family:'Tiro Devanagari H
 /* scrapbook background behind the storybook */
 .pb{background:url(assets/scrapbook.webp) center/cover no-repeat;padding:34px 0 26px!important;margin-top:28px!important;box-shadow:inset 0 0 40px rgba(120,70,30,.18)}
 .pb-hint{margin-bottom:6px!important}
+/* iPhone: never let anything widen the page (Safari zooms the whole layout out when something pokes past the edge) */
+html,body{overflow-x:clip!important;max-width:100%}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
+#app,#app>section,#app>footer{max-width:100vw;overflow-x:clip}
+#petals{overflow:hidden}
+img,svg,video,iframe{max-width:100%}
+
+/* ===== booth v7: transitions instead of scroll-scrubbing ===== */
+.b-wrap{height:480vh!important;height:480svh!important}
+.bx-strip{transition:transform 1s cubic-bezier(.45,.05,.25,1)!important;transform:translate3d(0,-110%,0)}
+.bx-f img{opacity:0;filter:sepia(.85) brightness(1.4) saturate(.6)!important;transition:opacity 1.2s ease .5s,filter 1.6s ease .5s}
+.bx-f.dev img{opacity:1;filter:sepia(.22) saturate(.82) contrast(1.06) brightness(1.03)!important}
+.bx-big{--tx:0px;--ty:0px;--s0:.3;opacity:0!important;transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(var(--s0))!important;
+  transition:transform .75s cubic-bezier(.2,.8,.2,1),opacity .3s ease!important;will-change:transform,opacity}
+.bx-big.on{opacity:1!important;transform:translate(-50%,-50%) scale(1) rotate(-2deg)!important}
+.bx-big.snap{transition:none!important}
+.bx-full{opacity:0!important;transform:translate(-50%,-50%) translateY(18%) scale(.6)!important;transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .5s ease!important}
+.bx-full.on{opacity:1!important;transform:translate(-50%,-50%) scale(1) rotate(-3deg)!important}
+.b-c{transition:opacity .6s ease .35s,transform .6s ease .35s}
+/* ===== marigolds v3: CSS animation, scroll only flips a class ===== */
+.mg-s{transform:translate3d(0,-110%,0)!important;transition:transform 1.25s cubic-bezier(.3,.7,.2,1) var(--d,0s)!important}
+.mg.fall .mg-s{transform:translate3d(0,0,0)!important}
+.mg.open .mg-s{transform:translate3d(var(--x,0),0,0)!important;transition:transform 1.4s cubic-bezier(.6,0,.3,1) 0s!important}
+.mg-bg{opacity:1;transition:opacity .25s ease}
+.mg.open .mg-bg{opacity:0}
+@media (prefers-reduced-motion:reduce){.mg-s{transition:none!important}}
+.bx-full .bx-mono i{display:inline!important;flex:none!important;overflow:visible!important}
+.bx-full{height:min(60vh,520px)!important;height:min(60svh,520px)!important;top:45%!important}

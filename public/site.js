@@ -303,63 +303,54 @@
     o.observe(row);
   })();
 
-  /* ---------------- Our Story photo booth: one strip of six feeds down out of the booth's slot ---------------- */
+  /* ---------------- Our Story photo booth: scroll picks the photo, CSS transitions do the moving (smooth on phones) ---------------- */
   (function () {
     var wrap = document.querySelector('.b-wrap'); if (!wrap) return;
-    var st = wrap.querySelector('.bx-strip'), mono = st && st.querySelector('.bx-mono');
+    var st = wrap.querySelector('.bx-strip'), mono = st.querySelector('.bx-mono'), bx = wrap.querySelector('.bx');
     var figs = [].slice.call(wrap.querySelectorAll('.bx-f')).sort(function (a, b) { return a.dataset.i - b.dataset.i; });
     var caps = [].slice.call(document.querySelectorAll('.b-c'));
-    var big = wrap.querySelector('.bx-big'), bigImg = big && big.querySelector('img'), full = wrap.querySelector('.bx-full');
-    var srcs = [1, 2, 3, 4, 5, 6].map(function (n) { return 'photos/story-' + n + '.webp'; });
-    var N = 6, END = 7.2, shownSrc = '', tk = false;
+    var big = wrap.querySelector('.bx-big'), bigImg = big.querySelector('img'), full = wrap.querySelector('.bx-full');
+    var N = 6, step = -2, tShow = 0, tk = false, wTop = 0, wH = 1;
+    function measure() { wTop = wrap.getBoundingClientRect().top + window.scrollY; wH = wrap.offsetHeight; }
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-    function eio(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
-    function fed(v) { v = Math.max(0, Math.min(N, v)); var k = Math.floor(v), f = v - k; return Math.min(N, k + eio(c01(f / 0.55))); }
-    function upd() {
-      tk = false;
-      var r = wrap.getBoundingClientRect(), span = wrap.offsetHeight - window.innerHeight;
-      var p = reduce ? 1 : c01(-r.top / Math.max(1, span));
-      var seg = p * END, out = fed(seg);
-      // feed: the first photo leads out of the slot; older photos slide on down past the window
-      if (st) {
-        var fh = figs[0].offsetHeight, gap = parseFloat(getComputedStyle(st).rowGap) || 4, H = st.offsetHeight;
-        var shown = out * (fh + gap) + c01((seg - N) / 0.3) * ((mono ? mono.offsetHeight : 0) + gap);
-        st.style.transform = 'translateY(' + (shown - H).toFixed(1) + 'px)';
-      }
-      var cur = -1;
-      figs.forEach(function (f, i) {
-        f.style.setProperty('--dev', (reduce ? 1 : c01((out - i - 0.1) / 0.9)).toFixed(3));
-        if (seg >= i + 0.05) cur = i;
-      });
-      caps.forEach(function (c, i) { c.classList.toggle('on', i === Math.min(cur, N - 1)); });
-      // each print grows out of its own frame, is held up big, then settles back in
-      if (big) {
-        var bi = Math.floor(seg), bt = seg - bi, v = 0;
-        if (bi >= 0 && bi < N) {
-          v = eio(c01((bt - 0.58) / 0.22)) * (1 - eio(c01((bt - 0.86) / 0.14)));
-          if (shownSrc !== srcs[bi]) { shownSrc = srcs[bi]; bigImg.src = shownSrc; }
-        }
-        if (reduce) v = 0;
-        var tx = 0, ty = 0, s0 = 0.3, frm = figs[bi], bx = big.parentNode;
-        if (frm && bx) {
-          var fr = frm.getBoundingClientRect(), br = bx.getBoundingClientRect(), bw = big.offsetWidth || 1;
-          tx = (fr.left + fr.width / 2) - (br.left + br.width * 0.5);
-          ty = (fr.top + fr.height / 2) - (br.top + br.height * 0.42);
-          s0 = fr.width / (bw * 0.93);
-        }
-        big.style.opacity = c01(v / 0.18).toFixed(3);
-        big.style.transform = 'translate(calc(-50% + ' + (tx * (1 - v)).toFixed(1) + 'px), calc(-50% + ' + (ty * (1 - v)).toFixed(1) + 'px)) scale(' + (s0 + (1 - s0) * v).toFixed(3) + ') rotate(' + ((bi % 2 ? 2 : -2) * v).toFixed(2) + 'deg)';
-      }
-      // finale: the finished strip of all six is lifted out and shown whole
-      if (full) {
-        var fv = reduce ? 1 : eio(c01((seg - 6.25) / 0.6));
-        full.style.opacity = c01(fv / 0.25).toFixed(3);
-        full.style.transform = 'translate(-50%,-50%) translateY(' + (30 * (1 - fv)).toFixed(1) + '%) scale(' + (0.55 + 0.45 * fv).toFixed(3) + ') rotate(' + (-3 * fv).toFixed(2) + 'deg)';
+    function park(i) {
+      // put the big print exactly over its frame on the strip (no transition), so it can grow out of it
+      var f = figs[i]; if (!f) return;
+      var fr = f.getBoundingClientRect(), br = bx.getBoundingClientRect(), bw = big.offsetWidth || 1;
+      big.style.setProperty('--tx', ((fr.left + fr.width / 2) - (br.left + br.width / 2)).toFixed(1) + 'px');
+      big.style.setProperty('--ty', ((fr.top + fr.height / 2) - (br.top + br.height * 0.42)).toFixed(1) + 'px');
+      big.style.setProperty('--s0', (fr.width / (bw * 0.93)).toFixed(3));
+    }
+    function apply(k) {
+      var shown = Math.max(0, Math.min(N, k + 1));
+      var fh = figs[0].offsetHeight, gap = 4, H = st.offsetHeight;
+      var y = shown * (fh + gap) + (k >= N ? mono.offsetHeight + gap : 0) - H;
+      st.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)';
+      figs.forEach(function (f, i) { f.classList.toggle('dev', i < shown); });
+      caps.forEach(function (c, i) { c.classList.toggle('on', i === Math.min(k, N - 1) && k >= 0); });
+      full.classList.toggle('on', k >= N);
+      // big print: tuck the current one back, then lift the new one once the strip has fed
+      clearTimeout(tShow);
+      if (big.classList.contains('on')) big.classList.remove('on');
+      if (k >= 0 && k < N) {
+        tShow = setTimeout(function () {
+          bigImg.src = 'photos/story-' + (k + 1) + '.webp';
+          big.classList.add('snap'); park(k); void big.offsetWidth; big.classList.remove('snap');
+          requestAnimationFrame(function () { big.classList.add('on'); });
+        }, reduce ? 0 : 950);
       }
     }
+    function upd() {
+      tk = false;
+      var p = c01((window.scrollY - wTop) / Math.max(1, wH - window.innerHeight));
+      var k = Math.min(N, Math.floor(p * (N + 1.4) - 0.4));
+      if (k !== step) { step = k; apply(k); }
+    }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
-    window.addEventListener('resize', upd);
-    window.addEventListener('load', upd); upd();
+    window.addEventListener('resize', function () { measure(); step = -2; upd(); });
+    window.addEventListener('load', function () { measure(); step = -2; upd(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); upd(); });
+    measure(); upd();
   })();
 
   /* ---------------- Our Story picture book: swipe, arrows and dots ---------------- */
@@ -466,7 +457,10 @@
         s.style.backgroundImage = 'url(' + t.url + ')'; s.style.backgroundSize = t.w + 'px ' + t.h + 'px';
         s.style.backgroundPosition = '0 ' + (-((c * 37) % 60)) + 'px';
         box.appendChild(s);
-        strands.push({ el: s, c: c, mid: (c + 0.5) / cols - 0.5, d: Math.abs((c + 0.5) / cols - 0.5) });
+        var mid = (c + 0.5) / cols - 0.5, dd = Math.abs(mid);
+        s.style.setProperty('--d', ((0.5 - dd) * 0.9).toFixed(2) + 's');
+        s.style.setProperty('--x', ((mid < 0 ? -1 : 1) * (60 + dd * 90)).toFixed(1) + 'vw');
+        strands.push({ el: s, c: c, mid: mid, d: dd });
       }
       upd();
     }
@@ -481,20 +475,14 @@
       if (isNear && !near) measure();                                    // re-check positions once as we approach
       near = isNear;
       var rtop = secTop - window.scrollY, span = secH - window.innerHeight;
-      if (rtop > window.innerHeight || rtop + secH < 0) return;          // off screen: do nothing
+      if (rtop > window.innerHeight) { sec.classList.remove('fall', 'open'); return; }   // not reached yet: reset
+      if (rtop + secH < 0) return;                                       // scrolled past: leave as is
       var p = reduce ? 1 : c01(-rtop / Math.max(1, span));
       // cream backdrop only below the end of Our Story (moved, not re-clipped, so it stays on the GPU)
       var cut = Math.max(0, (storyBot - sy) - Math.max(0, rtop));
       bg.style.transform = 'translate3d(0,' + cut.toFixed(0) + 'px,0)';
-      bg.style.opacity = (1 - c01((p - 0.56) / 0.03)).toFixed(3);
-      var open = eio(c01((p - 0.6) / 0.36));
-      strands.forEach(function (o) {
-        // fall in from the edges first, a cascade that meets in the middle
-        var fall = reduce ? 1 : eo(c01((p - (0.5 - o.d) * 0.36) / 0.3));
-        var sway = Math.sin(p * 9 + o.c) * 1.4 * (1 - open);
-        var x = (o.mid < 0 ? -1 : 1) * open * (60 + o.d * 90);   // part like a curtain
-        o.el.style.transform = 'translate3d(' + x.toFixed(1) + 'vw,' + (-110 * (1 - fall)).toFixed(1) + '%,0) rotate(' + sway.toFixed(2) + 'deg)';
-      });
+      sec.classList.toggle('fall', p > 0.01);
+      sec.classList.toggle('open', p > 0.58);
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
     var rt, lw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === lw) return; lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(build, 200); });
