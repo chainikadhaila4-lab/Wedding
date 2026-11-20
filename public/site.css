@@ -702,7 +702,7 @@ img,svg,video,iframe{max-width:100%}
 }
 
 /* ===== booth v8: one full screen, the page settles on it, photos play by themselves ===== */
-html{scroll-snap-type:y proximity}
+
 .b-wrap{height:auto!important;min-height:100vh;min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:0}
 .b-stick{position:relative!important;top:auto!important;height:auto!important;min-height:100vh;min-height:100svh;padding:96px 0 24px;box-sizing:border-box}
 .bx-img{filter:none!important}
@@ -736,3 +736,19 @@ html{scroll-snap-type:y proximity}
 /* four photos: shorter strip and five stops */
 .b-wrap{height:500vh!important;height:500svh!important}
 .bx-full{aspect-ratio:1/3.05!important}
+
+/* Our Story removed: the invitation card flows straight into the garlands and haldi */
+html{scroll-snap-type:none!important}
+/* envelope: always cover the whole screen on iPhone (the toolbar changes the screen height), and hide the page behind it */
+[data-k="envsec"],[data-k="loader"]{top:0!important;bottom:0!important;height:auto!important;min-height:100vh;min-height:100lvh}
+[data-k="env"]{inset:0!important;min-height:100%}
+body.locked{overflow:hidden;overscroll-behavior:none;touch-action:none}
+body.locked:not(.opening) #app>section:not([data-k]),body.locked:not(.opening) #app>footer,body.locked:not(.opening) #petals{visibility:hidden}
+[data-haldi]::before{background:linear-gradient(#F2EEE5,rgba(242,238,229,0))!important}
+
+/* soft background music toggle in the top bar */
+.bgm-btn{margin-left:auto;margin-right:10px;width:34px;height:32px;border:1px solid rgba(212,182,121,.5);background:transparent;color:#D4B679;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0}
+.bgm-btn .bgm-x{position:absolute;width:22px;height:1.5px;background:#D4B679;transform:rotate(-45deg)}
+.bgm-btn[aria-pressed="true"] .bgm-x{display:none}
+.bgm-btn[aria-pressed="true"]{background:rgba(212,182,121,.15)}
+.bgm-btn.nofile{display:none}

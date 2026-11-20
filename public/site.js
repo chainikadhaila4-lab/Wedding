@@ -400,7 +400,7 @@
   /* ---------------- marigold garlands carry you from Our Story into the celebrations ---------------- */
   (function () {
     var sec = document.querySelector('.mg'); if (!sec) return;
-    var box = sec.querySelector('.mg-str'), bg = sec.querySelector('.mg-bg'), stick = sec.querySelector('.mg-stick'), story = document.getElementById('story');
+    var box = sec.querySelector('.mg-str'), bg = sec.querySelector('.mg-bg'), stick = sec.querySelector('.mg-stick'), story = document.getElementById('story') || document.getElementById('top');
     var NS = 'http://www.w3.org/2000/svg';
     // one ruffled marigold, built once as a symbol and reused
     var defs = document.createElementNS(NS, 'svg'); defs.setAttribute('width', 0); defs.setAttribute('height', 0); defs.style.position = 'absolute';
@@ -492,6 +492,29 @@
       }, { threshold: 0.12 }).observe(hal);
     }
     var rt, lw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === lw) return; lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(build, 200); });
+  })();
+
+  /* ---------------- soft background music: starts with the first tap, fades in quietly, toggle in the top bar ---------------- */
+  (function () {
+    var au = document.getElementById('bgm'), btn = document.querySelector('.bgm-btn'); if (!au || !btn) return;
+    var MAX = 0.1, want = true, fadeT = 0;
+    try { if (localStorage.getItem('ca-music') === 'off') want = false; } catch (e) {}
+    au.addEventListener('error', function () { btn.classList.add('nofile'); });   // no music file uploaded yet: hide the button
+    function fade(to, ms, done) {
+      clearInterval(fadeT); var from = au.volume, t0 = Date.now();
+      fadeT = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / ms); au.volume = from + (to - from) * k; if (k >= 1) { clearInterval(fadeT); done && done(); } }, 50);
+    }
+    function on() { au.volume = 0; var p = au.play(); if (p && p.then) p.then(function () { fade(MAX, 2500); btn.setAttribute('aria-pressed', 'true'); }).catch(function () {}); else { fade(MAX, 2500); btn.setAttribute('aria-pressed', 'true'); } }
+    function off() { fade(0, 600, function () { au.pause(); }); btn.setAttribute('aria-pressed', 'false'); }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (au.paused) { want = true; on(); } else { want = false; off(); }
+      try { localStorage.setItem('ca-music', want ? 'on' : 'off'); } catch (err) {}
+    });
+    // browsers only allow sound after a tap or click: start on the first one (e.g. tapping the envelope)
+    function first() { if (want && au.paused) on(); ['click', 'touchend', 'keydown'].forEach(function (ev) { window.removeEventListener(ev, first, true); }); }
+    ['click', 'touchend', 'keydown'].forEach(function (ev) { window.addEventListener(ev, first, true); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden && !au.paused) au.pause(); else if (!document.hidden && want && au.paused && btn.getAttribute('aria-pressed') === 'true') au.play().catch(function () {}); });
   })();
 
   /* ---------------- petals ---------------- */
