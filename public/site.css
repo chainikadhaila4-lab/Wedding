@@ -867,3 +867,8 @@ html.ios .th-stick{position:relative!important;height:100vh!important;height:100
 html.ios .th-art{transform:none!important;will-change:auto!important}
 html.ios [data-flow]{transform:none!important;opacity:1!important}
 html.ios nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+/* iPhone: bring the motion back, as one-time timed animations */
+html.ios [data-hz],html.ios [data-wz]{transform:scale(1.18)!important;transition:transform 3s cubic-bezier(.25,.6,.25,1)!important;will-change:transform!important}
+html.ios .ios-in [data-hz],html.ios .ios-in [data-wz]{transform:scale(1)!important}
+html.ios [data-ht],html.ios [data-wt]{opacity:0!important;transform:translateY(18px)!important;transition:opacity .9s ease var(--d,0s),transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s)!important}
+html.ios .ios-in [data-ht],html.ios .ios-in [data-wt]{opacity:1!important;transform:none!important}

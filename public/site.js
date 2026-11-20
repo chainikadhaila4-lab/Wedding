@@ -786,3 +786,19 @@
   window.addEventListener('resize', onScroll);
   upd();
 })();
+
+/* iPhone: haldi and wedding animate once as they come on screen (timed, not pinned or tied to the scroll) */
+(function () {
+  if (!document.documentElement.classList.contains('ios')) return;
+  [['[data-haldi]', 'data-ht'], ['[data-wedding]', 'data-wt']].forEach(function (pair) {
+    var sec = document.querySelector(pair[0]); if (!sec) return;
+    sec.querySelectorAll('[' + pair[1] + ']').forEach(function (el) { el.style.setProperty('--d', (0.35 + parseFloat(el.getAttribute(pair[1])) * 3.2).toFixed(2) + 's'); });
+    if (!('IntersectionObserver' in window)) { sec.classList.add('ios-in'); return; }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) sec.classList.add('ios-in');
+        else if (e.boundingClientRect.top > window.innerHeight) sec.classList.remove('ios-in');   // replay only when coming back down to it
+      });
+    }, { threshold: 0.3 }).observe(sec);
+  });
+})();
