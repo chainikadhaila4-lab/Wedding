@@ -752,3 +752,20 @@ body.locked:not(.opening) #app>section:not([data-k]),body.locked:not(.opening) #
 .bgm-btn[aria-pressed="true"] .bgm-x{display:none}
 .bgm-btn[aria-pressed="true"]{background:rgba(212,182,121,.15)}
 .bgm-btn.nofile{display:none}
+
+/* ===== marigold burst (replaces the garlands) ===== */
+.mg-s{display:none!important}
+.mg-f{position:absolute;display:block;pointer-events:none;will-change:transform,opacity;opacity:0}
+
+/* two homes on phones: CSS transitions instead of per-frame scroll motion */
+#homes.touch .th-pol{transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .6s ease!important;opacity:0!important}
+#homes.touch .th-pol[data-s="bride"]{transform:translate(-55%,40px) scale(.9) rotate(calc(var(--r) - 8deg))!important}
+#homes.touch .th-pol[data-s="groom"]{transform:translate(55%,40px) scale(.9) rotate(calc(var(--r) + 8deg))!important}
+#homes.touch .th-pol.in{opacity:1!important;transform:rotate(var(--r))!important}
+#homes.touch .th-tag{transition:opacity .5s ease!important;opacity:0!important}
+#homes.touch .th-tag.in{opacity:1!important}
+#homes.touch .th-col{transition:transform .9s cubic-bezier(.4,0,.2,1)!important;transform:none!important}
+#homes.touch.joined .th-col.b{transform:translateX(26%) scale(.9)!important}
+#homes.touch.joined .th-col.g{transform:translateX(-26%) scale(.9)!important}
+#homes.touch .th-one{transition:opacity .6s ease .3s!important;opacity:0!important;transform:none!important}
+#homes.touch.joined .th-one{opacity:1!important}
