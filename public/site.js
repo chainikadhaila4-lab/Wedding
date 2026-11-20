@@ -310,8 +310,7 @@
     var figs = [].slice.call(wrap.querySelectorAll('.bx-f')).sort(function (a, b) { return a.dataset.i - b.dataset.i; });
     var caps = [].slice.call(document.querySelectorAll('.b-c'));
     var big = wrap.querySelector('.bx-big'), bigImg = big.querySelector('img'), full = wrap.querySelector('.bx-full');
-    var N = 6, step = -2, tShow = 0, tk = false, wTop = 0, wH = 1;
-    function measure() { wTop = wrap.getBoundingClientRect().top + window.scrollY; wH = wrap.offsetHeight; }
+    var N = figs.length, tShow = 0;
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function park(i) {
       // put the big print exactly over its frame on the strip (no transition), so it can grow out of it
@@ -334,24 +333,27 @@
       if (big.classList.contains('on')) big.classList.remove('on');
       if (k >= 0 && k < N) {
         tShow = setTimeout(function () {
-          bigImg.src = 'photos/story-' + (k + 1) + '.webp';
+          bigImg.src = figs[k].querySelector('img').getAttribute('src');
           big.classList.add('snap'); park(k); void big.offsetWidth; big.classList.remove('snap');
           requestAnimationFrame(function () { big.classList.add('on'); });
-        }, reduce ? 0 : 950);
+        }, reduce ? 0 : 750);
       }
     }
+    // one swipe = one photo: the page snaps to a stop for each photo and waits for the next swipe
+    var cur = -2, tk = false;
     function upd() {
       tk = false;
-      var p = c01((window.scrollY - wTop) / Math.max(1, wH - window.innerHeight));
-      var k = Math.min(N, Math.floor(p * (N + 1.4) - 0.4));
-      if (k !== step) { step = k; apply(k); }
+      var r = wrap.getBoundingClientRect(), vh = window.innerHeight;
+      if (r.bottom < 0 || r.top > vh) return;
+      var k = Math.max(0, Math.min(N, Math.round(-r.top / vh)));
+      if (r.top > vh * 0.5) k = -1;
+      if (k !== cur) { cur = k; apply(k); }
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
     var bw0 = window.innerWidth;
-    window.addEventListener('resize', function () { measure(); if (window.innerWidth !== bw0) { bw0 = window.innerWidth; step = -2; } upd(); });
-    window.addEventListener('load', function () { measure(); step = -2; upd(); });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); upd(); });
-    measure(); upd();
+    window.addEventListener('resize', function () { if (window.innerWidth !== bw0) { bw0 = window.innerWidth; cur = -2; } upd(); });
+    upd();
+    apply(-1);
   })();
 
   /* ---------------- Our Story picture book: swipe, arrows and dots ---------------- */
@@ -468,21 +470,27 @@
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     function eio(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
-    var tk = false;
-    function upd() {
-      tk = false;
-      var sy = window.scrollY;
-      var rtop = sec.getBoundingClientRect().top, span = sec.offsetHeight - window.innerHeight;   // live: iPhone layouts shift as images and fonts load
-      if (rtop > window.innerHeight) { sec.classList.remove('fall', 'open'); return; }   // not reached yet: reset
-      if (rtop + secH < 0) return;                                       // scrolled past: leave as is
-      var p = reduce ? 1 : c01(-rtop / Math.max(1, span));
-      // cream backdrop only below the end of Our Story (moved, not re-clipped, so it stays on the GPU)
-      var cut = Math.max(0, story.getBoundingClientRect().bottom - Math.max(0, rtop));
-      bg.style.transform = 'translate3d(0,' + cut.toFixed(0) + 'px,0)';
-      sec.classList.toggle('fall', rtop <= 2);                            // only once the stage is pinned to the top
-      sec.classList.toggle('open', p > 0.58);
+    // garlands are a fixed overlay that plays a short CSS sweep when the haldi scene arrives (no sticky maths, no scroll-scrubbing)
+    var hal = document.querySelector('[data-haldi]'), busyG = false, lastY = window.scrollY;
+    function play() {
+      if (busyG) return; busyG = true;
+      sec.classList.remove('open'); sec.classList.add('on');
+      requestAnimationFrame(function () { requestAnimationFrame(function () { sec.classList.add('fall'); }); });
+      setTimeout(function () { sec.classList.add('open'); }, reduce ? 0 : 1900);
+      setTimeout(function () { sec.classList.remove('on', 'fall', 'open'); busyG = false; }, reduce ? 50 : 3600);
     }
-    window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
+    function upd() {}
+    if (hal && 'IntersectionObserver' in window) {
+      var armed = true;
+      window.addEventListener('scroll', function () { lastY = window.scrollY; }, { passive: true });
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          var goingDown = e.boundingClientRect.top > 0;   // haldi entering from below
+          if (e.isIntersecting && armed && goingDown) { armed = false; play(); }
+          if (!e.isIntersecting && e.boundingClientRect.top > 0) armed = true;   // scrolled back above it: allow again
+        });
+      }, { threshold: 0.12 }).observe(hal);
+    }
     var rt, lw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === lw) return; lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(build, 200); });
   })();
 

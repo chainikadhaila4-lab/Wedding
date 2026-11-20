@@ -700,3 +700,39 @@ img,svg,video,iframe{max-width:100%}
 @media (pointer:coarse){
   .mg{background:linear-gradient(180deg,transparent 0,transparent 60svh,#E8D6B6 60svh,#E8D6B6 100svh,transparent 100svh)!important}
 }
+
+/* ===== booth v8: one full screen, the page settles on it, photos play by themselves ===== */
+html{scroll-snap-type:y proximity}
+.b-wrap{height:auto!important;min-height:100vh;min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:0}
+.b-stick{position:relative!important;top:auto!important;height:auto!important;min-height:100vh;min-height:100svh;padding:96px 0 24px;box-sizing:border-box}
+.bx-img{filter:none!important}
+.bx{height:min(62vh,580px)!important;height:min(62svh,580px)!important}
+
+/* ===== garlands v4: fixed overlay sweep ===== */
+.mg{position:fixed!important;inset:0!important;height:100vh!important;height:100svh!important;margin:0!important;z-index:35!important;
+  pointer-events:none;background:none!important;visibility:hidden}
+.mg.on{visibility:visible}
+.mg-stick{position:absolute!important;inset:0;height:100%!important;top:0}
+.mg-bg{display:none!important}
+.mg-s{transition:transform 1.2s cubic-bezier(.3,.7,.2,1) var(--d,0s)!important}
+.mg.open .mg-s{transition:transform 1.3s cubic-bezier(.6,0,.3,1) 0s!important}
+@media (min-width:481px){.mg{left:max(0px,calc(50% - 240px))!important;right:max(0px,calc(50% - 240px))!important}}
+/* soft hand-off from Our Story's cream into the haldi photo */
+[data-haldi]{position:relative}
+[data-haldi]::before{content:"";position:absolute;left:0;right:0;top:-1px;height:170px;z-index:3;pointer-events:none;background:linear-gradient(#E8D6B6,rgba(232,214,182,0))}
+.st-close{min-height:72vh!important;min-height:72svh!important;padding-bottom:0!important}
+
+/* ===== booth v9: pinned, one snap stop per photo ===== */
+.b-wrap{position:relative;height:700vh!important;height:700svh!important;min-height:0!important;scroll-snap-align:none!important}
+.b-snap{position:absolute;left:0;width:1px;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;pointer-events:none}
+.b-stick{position:sticky!important;top:0!important;height:100vh!important;height:100svh!important;min-height:0!important;padding:84px 0 16px!important}
+.bx-big{transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .25s ease!important}
+/* big print and finale strip always fit the visible screen (short iPhone screens with the toolbar showing) */
+.bx-big{width:min(64vw,270px,40svh)!important;top:44%!important}
+.bx-full{height:min(56svh,480px)!important}
+.b-stick{padding-top:96px!important}
+.bx{height:min(58svh,560px)!important}
+
+/* four photos: shorter strip and five stops */
+.b-wrap{height:500vh!important;height:500svh!important}
+.bx-full{aspect-ratio:1/3.05!important}
