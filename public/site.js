@@ -470,18 +470,15 @@
     var tk = false;
     function upd() {
       tk = false;
-      var sy = window.scrollY, rtop0 = secTop - sy;
-      var isNear = rtop0 < window.innerHeight * 2 && rtop0 + secH > -window.innerHeight;
-      if (isNear && !near) measure();                                    // re-check positions once as we approach
-      near = isNear;
-      var rtop = secTop - window.scrollY, span = secH - window.innerHeight;
+      var sy = window.scrollY;
+      var rtop = sec.getBoundingClientRect().top, span = sec.offsetHeight - window.innerHeight;   // live: iPhone layouts shift as images and fonts load
       if (rtop > window.innerHeight) { sec.classList.remove('fall', 'open'); return; }   // not reached yet: reset
       if (rtop + secH < 0) return;                                       // scrolled past: leave as is
       var p = reduce ? 1 : c01(-rtop / Math.max(1, span));
       // cream backdrop only below the end of Our Story (moved, not re-clipped, so it stays on the GPU)
-      var cut = Math.max(0, (storyBot - sy) - Math.max(0, rtop));
+      var cut = Math.max(0, story.getBoundingClientRect().bottom - Math.max(0, rtop));
       bg.style.transform = 'translate3d(0,' + cut.toFixed(0) + 'px,0)';
-      sec.classList.toggle('fall', p > 0.01);
+      sec.classList.toggle('fall', rtop <= 2);                            // only once the stage is pinned to the top
       sec.classList.toggle('open', p > 0.58);
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
