@@ -222,9 +222,12 @@
       if (span <= 0) return;
       var p = c01(-r.top / span);
       if (TCH) {   // phones: no per-frame motion (it shakes on iPhone); each photo glides in with CSS once you reach it
-        pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; el.classList.toggle('in', p > 0.1 + k + (+el.dataset.n) * 0.06); });
-        tags.forEach(function (t, i) { t.classList.toggle('in', p > 0.1 + i * 0.22 && p < 0.66); });
-        sec.classList.toggle('joined', p > 0.66);
+        // add-only with hysteresis, so iPhone's elastic scrolling can't flip things back and forth
+        if (p < 0.03) { pols.forEach(function (el) { el.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); return; }
+        pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; if (p > 0.1 + k + (+el.dataset.n) * 0.06) el.classList.add('in'); });
+        if (p > 0.7) sec.classList.add('joined'); else if (p < 0.6) sec.classList.remove('joined');
+        var j = sec.classList.contains('joined');
+        tags.forEach(function (t, i) { if (j) t.classList.remove('in'); else if (p > 0.1 + i * 0.22) t.classList.add('in'); });
         return;
       }
       var fade = c01((p - 0.28) / 0.12);
@@ -499,6 +502,7 @@
   var colors = [['#FFB347','#E8731A'], ['#FFD25C','#F2A019'], ['#F28C28','#C8571B'], ['#E2557F','#A61E4D'], ['#FFFFFF','#EADBC8'], ['#F7A8C0','#D96A92']];
   function petals() {
     if (reduce) return;
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;   // phones: no falling petals (keeps scrolling smooth)
     var n = window.innerWidth < 640 ? 30 : 44;
     for (var i = 0; i < n; i++) {
       var p = document.createElement('span'); p.className = 'petal';
@@ -563,7 +567,10 @@
     var p = prog(sec);
     var img = sec.querySelector(imgSel);
     if (TOUCH) {   // phones: no per-frame motion inside pinned scenes (it shakes on iPhone); text fades in with CSS instead
-      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) { el.classList.toggle('t-in', reduce || p >= parseFloat(el.getAttribute(txtAttr))); });
+      var back = r.top > vh * 0.4;   // scrolled back above the scene: reset; otherwise only ever add (no flicker from iPhone's bounce)
+      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) {
+        if (back) el.classList.remove('t-in'); else if (reduce || p >= parseFloat(el.getAttribute(txtAttr))) el.classList.add('t-in');
+      });
       return;
     }
     if (img) img.style.transform = 'scale(' + (1.28 - 0.28 * p).toFixed(4) + ')';
@@ -600,7 +607,7 @@
     stickyScene(haldi, '[data-hz]', 'data-ht');
     stickyScene(wed, '[data-wz]', 'data-wt');
     var h = document.documentElement.scrollHeight - vh;
-    thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
+    if (!TOUCH) thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
     var cur = -1;
     targets.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < vh * 0.4) cur = i; });
     links.forEach(function (a, i) { a.classList.toggle('active', i === cur); });

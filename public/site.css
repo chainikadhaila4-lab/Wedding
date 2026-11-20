@@ -769,3 +769,13 @@ body.locked:not(.opening) #app>section:not([data-k]),body.locked:not(.opening) #
 #homes.touch.joined .th-col.g{transform:translateX(-26%) scale(.9)!important}
 #homes.touch .th-one{transition:opacity .6s ease .3s!important;opacity:0!important;transform:none!important}
 #homes.touch.joined .th-one{opacity:1!important}
+
+/* iPhone: pinned scenes use the LARGE viewport height, so they don't resize (and jump) when Safari's toolbar hides/shows while scrolling */
+@media (pointer:coarse){
+  .th-stick,[data-haldi]>div,[data-wedding]>div{height:100vh!important;height:100lvh!important}
+  #petals{display:none!important}
+  .petal{animation:none!important}
+}
+@media (pointer:coarse){
+  [data-k="nav"]{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgb(42,9,16)!important}
+}
