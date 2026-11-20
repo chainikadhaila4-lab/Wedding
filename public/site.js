@@ -139,6 +139,7 @@
     // dive in: the envelope rushes past the camera and the Two homes scene settles into view, layer by layer
     later(function () {
       var SOFT = 'cubic-bezier(.45,0,.2,1)', OUT2 = 'cubic-bezier(.2,.8,.2,1)';
+      body.classList.add('diving');
       window.scrollTo(0, 0);
       var stick = document.querySelector('.th-stick'), names = [].slice.call(document.querySelectorAll('.th-names > *'));
       var bank = document.querySelector('.th-bank'), lv = document.querySelectorAll('.th-leaf'), ttl = document.querySelector('.th-title');
@@ -151,7 +152,7 @@
         K('envsec').style.display = 'none'; env.style.pointerEvents = 'none';
         K('invite').style.transform = 'none';
         K('nav').style.transform = 'translateY(0)';
-        body.classList.remove('locked', 'opening'); body.classList.add('opened');
+        body.classList.remove('locked', 'opening', 'diving'); body.classList.add('opened');
         if (ttl) anim(ttl, [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, easing: OUT2, fill: 'none' });
         names.forEach(function (n, i) { anim(n, [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 600 + i * 220, easing: OUT2, fill: 'backwards' }); });
         petals();
@@ -214,11 +215,21 @@
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
+    var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (TCH) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
     function upd() {
       tk = false;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       var p = c01(-r.top / span);
+      if (TCH) {
+        if (p < 0.03) { pols.forEach(function (el) { el.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); return; }
+        pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; if (p > 0.1 + k + (+el.dataset.n) * 0.06) el.classList.add('in'); });
+        if (p > 0.7) sec.classList.add('joined'); else if (p < 0.6) sec.classList.remove('joined');
+        var j = sec.classList.contains('joined');
+        tags.forEach(function (t, i) { if (j) t.classList.remove('in'); else if (p > 0.1 + i * 0.22) t.classList.add('in'); });
+        return;
+      }
       var fade = c01((p - 0.28) / 0.12);
       calls.forEach(function (el) { el.style.opacity = el.classList.contains('on') ? String(1 - fade) : ''; });
       // 1) each side arrives on its own: bride's family from the left, then the groom's from the right
@@ -536,7 +547,7 @@
   var colors = [['#FFB347','#E8731A'], ['#FFD25C','#F2A019'], ['#F28C28','#C8571B'], ['#E2557F','#A61E4D'], ['#FFFFFF','#EADBC8'], ['#F7A8C0','#D96A92']];
   function petals() {
     if (reduce) return;
-    var n = window.innerWidth < 640 ? 30 : 44;
+    var n = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ? 12 : (window.innerWidth < 640 ? 30 : 44);
     for (var i = 0; i < n; i++) {
       var p = document.createElement('span'); p.className = 'petal';
       var b = document.createElement('b'), depth = Math.random(), sz = 9 + depth * 14;
@@ -600,7 +611,10 @@
     var p = prog(sec);
     var img = sec.querySelector(imgSel);
     if (TOUCH) {   // phones: no per-frame motion inside pinned scenes (it shakes on iPhone); text fades in with CSS instead
-      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) { el.classList.toggle('t-in', reduce || p >= parseFloat(el.getAttribute(txtAttr))); });
+      var back = r.top > vh * 0.4;
+      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) {
+        if (back) el.classList.remove('t-in'); else if (reduce || p >= parseFloat(el.getAttribute(txtAttr))) el.classList.add('t-in');
+      });
       return;
     }
     if (img) img.style.transform = 'scale(' + (1.28 - 0.28 * p).toFixed(4) + ')';
@@ -637,7 +651,7 @@
     stickyScene(haldi, '[data-hz]', 'data-ht');
     stickyScene(wed, '[data-wz]', 'data-wt');
     var h = document.documentElement.scrollHeight - vh;
-    thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
+    if (!TOUCH) thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
     var cur = -1;
     targets.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < vh * 0.4) cur = i; });
     links.forEach(function (a, i) { a.classList.toggle('active', i === cur); });

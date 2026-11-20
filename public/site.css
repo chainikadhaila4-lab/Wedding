@@ -750,3 +750,24 @@ html{scroll-snap-type:y proximity}
   display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid rgba(212,182,121,.6);background:rgba(42,9,16,.92);color:#F1EADC;font:500 13px Jost,Mukta,sans-serif;letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)}
 .bgm-hint.show{opacity:1;transform:translate(-50%,0)}
 .bgm-hint .bgm-n{color:#D4B679;font-size:16px}
+
+/* ===== v12 smoothness pass for phones (same design) ===== */
+#homes.touch .th-pol{transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .6s ease!important;opacity:0!important}
+#homes.touch .th-pol[data-s="bride"]{transform:translate(-55%,40px) scale(.9) rotate(calc(var(--r) - 8deg))!important}
+#homes.touch .th-pol[data-s="groom"]{transform:translate(55%,40px) scale(.9) rotate(calc(var(--r) + 8deg))!important}
+#homes.touch .th-pol.in{opacity:1!important;transform:rotate(var(--r))!important}
+#homes.touch .th-tag{transition:opacity .5s ease!important;opacity:0!important}
+#homes.touch .th-tag.in{opacity:1!important}
+#homes.touch .th-col{transition:transform .9s cubic-bezier(.4,0,.2,1)!important;transform:none!important}
+#homes.touch.joined .th-col.b{transform:translateX(26%) scale(.9)!important}
+#homes.touch.joined .th-col.g{transform:translateX(-26%) scale(.9)!important}
+#homes.touch .th-one{transition:opacity .6s ease .3s!important;opacity:0!important;transform:none!important}
+#homes.touch.joined .th-one{opacity:1!important}
+@media (pointer:coarse){
+  [data-k="nav"]{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgb(42,9,16)!important}
+  .petal b{filter:none!important}
+}
+/* envelope covers the whole phone screen; the page behind stays hidden until the dive-in */
+[data-k="envsec"],[data-k="loader"]{top:0!important;bottom:0!important;height:auto!important;min-height:100vh;min-height:100lvh}
+[data-k="env"]{inset:0!important;min-height:100%}
+body.locked:not(.diving) #app>section:not([data-k]),body.locked:not(.diving) #app>footer,body.locked:not(.diving) #petals{visibility:hidden}
