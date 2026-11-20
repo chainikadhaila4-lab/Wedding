@@ -139,6 +139,7 @@
     // dive in: the envelope rushes past the camera and the Two homes scene settles into view, layer by layer
     later(function () {
       var SOFT = 'cubic-bezier(.45,0,.2,1)', OUT2 = 'cubic-bezier(.2,.8,.2,1)';
+      body.classList.add('diving');
       window.scrollTo(0, 0);
       var stick = document.querySelector('.th-stick'), names = [].slice.call(document.querySelectorAll('.th-names > *'));
       var bank = document.querySelector('.th-bank'), lv = document.querySelectorAll('.th-leaf'), ttl = document.querySelector('.th-title');
@@ -151,7 +152,7 @@
         K('envsec').style.display = 'none'; env.style.pointerEvents = 'none';
         K('invite').style.transform = 'none';
         K('nav').style.transform = 'translateY(0)';
-        body.classList.remove('locked', 'opening'); body.classList.add('opened');
+        body.classList.remove('locked', 'opening', 'diving'); body.classList.add('opened');
         if (ttl) anim(ttl, [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, easing: OUT2, fill: 'none' });
         names.forEach(function (n, i) { anim(n, [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 600 + i * 220, easing: OUT2, fill: 'backwards' }); });
         petals();
@@ -215,13 +216,27 @@
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
     var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    if (TCH) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
+    if (TCH) {
+      sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); });
+      // phones: the scene is one normal screen; once it's in view the families arrive on a timer, then meet as one
+      var played = false;
+      function playHomes() {
+        if (played) return; played = true;
+        pols.forEach(function (el) { var d = (el.dataset.s === 'bride' ? 0 : 1300) + (+el.dataset.n) * 350; setTimeout(function () { el.classList.add('in'); }, reduce ? 0 : d); });
+        tags.forEach(function (t, i) { setTimeout(function () { t.classList.add('in'); }, reduce ? 0 : i * 1300); });
+        setTimeout(function () { sec.classList.add('joined'); tags.forEach(function (t) { t.classList.remove('in'); }); }, reduce ? 0 : 3600);
+      }
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { if (es[0].isIntersecting && document.body.classList.contains('opened')) playHomes(); }, { threshold: 0.5 }).observe(sec);
+      else playHomes();
+      var chk = setInterval(function () { if (document.body.classList.contains('opened')) { clearInterval(chk); var r0 = sec.getBoundingClientRect(); if (r0.top < window.innerHeight * 0.5 && r0.bottom > 0) setTimeout(playHomes, 600); } }, 300);
+    }
     function upd() {
       tk = false;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       var p = c01(-r.top / span);
-      if (TCH) {   // phones: no per-frame motion (it shakes on iPhone); each photo glides in with CSS once you reach it
+      if (TCH) return;
+      if (false) {   // (old phone path, replaced by the timed reveal above)
         // add-only with hysteresis, so iPhone's elastic scrolling can't flip things back and forth
         if (p < 0.03) { pols.forEach(function (el) { el.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); return; }
         pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; if (p > 0.1 + k + (+el.dataset.n) * 0.06) el.classList.add('in'); });
@@ -560,7 +575,20 @@
     var r = sec.getBoundingClientRect();
     return clamp(-r.top / Math.max(1, r.height - window.innerHeight));
   }
+  if (TOUCH) {
+    document.documentElement.classList.add('nopin');
+    [haldi, wed].forEach(function (sec) {
+      if (!sec) return;
+      var attr = sec.hasAttribute('data-haldi') ? 'data-ht' : 'data-wt';
+      sec.querySelectorAll('[' + attr + ']').forEach(function (el) { el.style.setProperty('--dl', (parseFloat(el.getAttribute(attr)) * 3).toFixed(2) + 's'); });
+      if ('IntersectionObserver' in window && !reduce) {
+        var o = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { sec.classList.add('ev-in'); o.disconnect(); } }, { threshold: 0, rootMargin: '0px 0px -35% 0px' });
+        o.observe(sec);
+      } else sec.classList.add('ev-in');
+    });
+  }
   function stickyScene(sec, imgSel, txtAttr) {
+    if (TOUCH) return;
     if (!sec) return;
     var r = sec.getBoundingClientRect(), vh = window.innerHeight;
     if (r.bottom < -50 || r.top > vh + 50) return;
