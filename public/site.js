@@ -542,6 +542,41 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden && !au.paused) au.pause(); else if (!document.hidden && want && au.paused && btn.getAttribute('aria-pressed') === 'true') au.play().catch(function () {}); });
   })();
 
+  /* ---------------- scroll test meter: only when the address ends with ?perf (guests never see it) ---------------- */
+  (function () {
+    if (!/[?&]perf/.test(location.search)) return;
+    var box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,.82);color:#fff;font:12px/1.35 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;white-space:pre';
+    document.body.appendChild(box);
+    var secs = [['two homes', '#homes'], ['card', '#top'], ['story', '#story'], ['haldi', '[data-haldi]'], ['wedding', '[data-wedding]'], ['venue', '#venue']];
+    var stats = {}, last = 0, lastY = window.scrollY, frames = 0, slow = 0, t0 = performance.now();
+    function where() {
+      var name = 'top', vh = window.innerHeight;
+      secs.forEach(function (s) { var e = document.querySelector(s[1]); if (e && e.getBoundingClientRect().top < vh * 0.5) name = s[0]; });
+      return name;
+    }
+    function tick(t) {
+      if (last) {
+        var dt = t - last, moving = window.scrollY !== lastY;
+        if (moving) {
+          var w = where(); var s = stats[w] || (stats[w] = { f: 0, slow: 0, worst: 0 });
+          s.f++; if (dt > 34) s.slow++; if (dt > s.worst) s.worst = dt;
+          frames++; if (dt > 34) slow++;
+        }
+      }
+      last = t; lastY = window.scrollY;
+      if (t - t0 > 400) {
+        t0 = t;
+        var lines = ['SCROLL TEST  (slow = frame over 34ms)'];
+        Object.keys(stats).forEach(function (k) { var s = stats[k]; lines.push(k + ': ' + s.slow + ' slow / ' + s.f + ' (' + Math.round(100 * s.slow / Math.max(1, s.f)) + '%) worst ' + Math.round(s.worst) + 'ms'); });
+        lines.push('TOTAL: ' + slow + ' slow / ' + frames);
+        box.textContent = lines.join('\n');
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+
   /* ---------------- petals ---------------- */
   var box = document.getElementById('petals');
   var colors = [['#FFB347','#E8731A'], ['#FFD25C','#F2A019'], ['#F28C28','#C8571B'], ['#E2557F','#A61E4D'], ['#FFFFFF','#EADBC8'], ['#F7A8C0','#D96A92']];
