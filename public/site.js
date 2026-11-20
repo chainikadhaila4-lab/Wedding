@@ -46,14 +46,16 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
+  // text length changes with the language, so every scroll scene re-measures itself right away
+  function relayout() { requestAnimationFrame(function () { window.dispatchEvent(new Event('resize')); window.dispatchEvent(new Event('scroll')); }); }
   function setLang(l, e) {
     if (e) e.stopPropagation();
     if (l === lang) return;
     lang = l;
     try { localStorage.setItem('ca-lang', l); } catch (err) {}
-    if (reduce || !body.classList.contains('opened')) { apply(l); return; }
+    if (reduce || !body.classList.contains('opened')) { apply(l); relayout(); return; }
     app.classList.add('swap');
-    setTimeout(function () { apply(l); app.classList.remove('swap'); onScroll(); }, 190);
+    setTimeout(function () { apply(l); app.classList.remove('swap'); onScroll(); relayout(); }, 190);
   }
   app.querySelectorAll('[data-lang]').forEach(function (b) {
     b.addEventListener('click', function (e) { setLang(b.dataset.lang, e); });
@@ -360,6 +362,47 @@
     window.addEventListener('load', upd); upd();
   })();
 
+  /* ---------------- Our Story picture book: swipe, arrows and dots ---------------- */
+  (function () {
+    var tr = document.querySelector('.pb-track'); if (!tr) return;
+    var pgs = [].slice.call(tr.querySelectorAll('.pb-pg')), dots = [].slice.call(document.querySelectorAll('.pb-dots i'));
+    var arrs = [].slice.call(document.querySelectorAll('.pb-arr')), cur = -1, tk = false, opened = false, book = document.querySelector('.pb');
+    // split each line into words so it can be "written" onto the page like a storybook
+    function split(p) {
+      var sp = p.querySelector('figcaption span'); if (!sp) return;
+      var words = sp.textContent.trim().split(/\s+/);
+      sp.innerHTML = words.map(function (w, i) { return '<i class="w" style="font-style:inherit;transition-delay:' + (0.25 + i * 0.12).toFixed(2) + 's">' + w + '</i>'; }).join(' ');
+    }
+    function tell(p) { if (!p || p.classList.contains('told')) return; split(p); void p.offsetWidth; p.classList.add('told'); }
+    // language changes rewrite the captions; re-split whatever is already told
+    function retell() { pgs.forEach(function (p) { if (p.classList.contains('told')) { p.classList.remove('told'); tell(p); } }); }
+    new MutationObserver(function () { setTimeout(retell, 30); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    // the cover opens by itself when the book comes into view, then the first page tells its line
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return; io.disconnect();
+        setTimeout(function () { book.classList.add('open'); setTimeout(function () { opened = true; tell(pgs[Math.max(0, cur)]); }, reduce ? 0 : 1100); }, reduce ? 0 : 350);
+      }, { threshold: 0.55 });
+      io.observe(book);
+    } else { book.classList.add('open'); opened = true; }
+    function mark() {
+      tk = false;
+      var mid = tr.scrollLeft + tr.clientWidth / 2, best = 0, bd = 1e9;
+      pgs.forEach(function (p, i) { var d = Math.abs(p.offsetLeft + p.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } });
+      if (best === cur) return; cur = best;
+      pgs.forEach(function (p, i) { p.classList.toggle('on', i === cur); });
+      if (opened) tell(pgs[cur]);
+      dots.forEach(function (d, i) { d.classList.toggle('on', i === cur); });
+      arrs[0].disabled = cur === 0; arrs[1].disabled = cur === pgs.length - 1;
+    }
+    function go(i) { i = Math.max(0, Math.min(pgs.length - 1, i)); var p = pgs[i]; tr.scrollTo({ left: p.offsetLeft - (tr.clientWidth - p.offsetWidth) / 2, behavior: reduce ? 'auto' : 'smooth' }); }
+    tr.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(mark); } }, { passive: true });
+    arrs.forEach(function (a) { a.addEventListener('click', function () { go(cur + (+a.dataset.d)); }); });
+    tr.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); } });
+    window.addEventListener('resize', function () { cur = -1; mark(); });
+    mark();
+  })();
+
   /* ---------------- marigold garlands carry you from Our Story into the celebrations ---------------- */
   (function () {
     var sec = document.querySelector('.mg'); if (!sec) return;
@@ -404,8 +447,15 @@
       }
       return { url: cv.toDataURL('image/png'), w: w, h: h };
     }
+    var secTop = 0, secH = 1, storyBot = 0;
+    function measure() { var sy = window.scrollY; secTop = sec.getBoundingClientRect().top + sy; secH = sec.offsetHeight; storyBot = story.getBoundingClientRect().bottom + sy; }
+    window.addEventListener('load', function () { measure(); upd(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); });
+    var near = false;
+    window.addEventListener('resize', function () { measure(); upd(); });
     function build() {
       if (!flower) return;
+      measure();
       box.innerHTML = ''; strands = [];
       var W = box.clientWidth, H = box.clientHeight;
       var cols = W < 600 ? 9 : 15, w = W / cols, fs = w * 1.25;
@@ -426,11 +476,16 @@
     var tk = false;
     function upd() {
       tk = false;
-      var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
-      var p = reduce ? 1 : c01(-r.top / Math.max(1, span));
-      // cream backdrop only below the end of Our Story; it drops away once garlands cover the screen and haldi is pinned behind
-      var cut = Math.max(0, story.getBoundingClientRect().bottom - stick.getBoundingClientRect().top);
-      bg.style.clipPath = 'inset(' + cut.toFixed(0) + 'px 0 0 0)';
+      var sy = window.scrollY, rtop0 = secTop - sy;
+      var isNear = rtop0 < window.innerHeight * 2 && rtop0 + secH > -window.innerHeight;
+      if (isNear && !near) measure();                                    // re-check positions once as we approach
+      near = isNear;
+      var rtop = secTop - window.scrollY, span = secH - window.innerHeight;
+      if (rtop > window.innerHeight || rtop + secH < 0) return;          // off screen: do nothing
+      var p = reduce ? 1 : c01(-rtop / Math.max(1, span));
+      // cream backdrop only below the end of Our Story (moved, not re-clipped, so it stays on the GPU)
+      var cut = Math.max(0, (storyBot - sy) - Math.max(0, rtop));
+      bg.style.transform = 'translate3d(0,' + cut.toFixed(0) + 'px,0)';
       bg.style.opacity = (1 - c01((p - 0.56) / 0.03)).toFixed(3);
       var open = eio(c01((p - 0.6) / 0.36));
       strands.forEach(function (o) {
@@ -438,7 +493,7 @@
         var fall = reduce ? 1 : eo(c01((p - (0.5 - o.d) * 0.36) / 0.3));
         var sway = Math.sin(p * 9 + o.c) * 1.4 * (1 - open);
         var x = (o.mid < 0 ? -1 : 1) * open * (60 + o.d * 90);   // part like a curtain
-        o.el.style.transform = 'translate(' + x.toFixed(1) + 'vw,' + (-110 * (1 - fall)).toFixed(1) + '%) rotate(' + sway.toFixed(2) + 'deg)';
+        o.el.style.transform = 'translate3d(' + x.toFixed(1) + 'vw,' + (-110 * (1 - fall)).toFixed(1) + '%,0) rotate(' + sway.toFixed(2) + 'deg)';
       });
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
