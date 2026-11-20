@@ -248,7 +248,7 @@
 
   /* ---------------- scroll flow: things grow in as they arrive, shrink away as they leave ---------------- */
   (function () {
-    if (reduce) return;
+    if (reduce || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches)) return;   // touch screens: skip, it shakes on iPhone
     var sels = ['#top > div:first-child', '#events > .diyas', '#events > div:nth-child(2) > div:first-child', '#venue > div', 'footer > div:nth-child(2)'];
     var els = [];
     sels.forEach(function (q) { document.querySelectorAll(q).forEach(function (el) { if (els.indexOf(el) < 0) { el.setAttribute('data-flow', ''); els.push(el); } }); });
@@ -347,7 +347,8 @@
       if (k !== step) { step = k; apply(k); }
     }
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
-    window.addEventListener('resize', function () { measure(); step = -2; upd(); });
+    var bw0 = window.innerWidth;
+    window.addEventListener('resize', function () { measure(); if (window.innerWidth !== bw0) { bw0 = window.innerWidth; step = -2; } upd(); });
     window.addEventListener('load', function () { measure(); step = -2; upd(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); upd(); });
     measure(); upd();
@@ -530,6 +531,7 @@
   }
 
   /* ---------------- scroll scenes (one rAF-throttled handler) ---------------- */
+  var TOUCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   var clamp = function (v) { return Math.min(1, Math.max(0, v)); };
   var ease3 = function (x) { return 1 - Math.pow(1 - x, 3); };
   var scenes = [].slice.call(app.querySelectorAll('[data-scene]'));
@@ -552,6 +554,10 @@
     if (r.bottom < -50 || r.top > vh + 50) return;
     var p = prog(sec);
     var img = sec.querySelector(imgSel);
+    if (TOUCH) {   // phones: no per-frame motion inside pinned scenes (it shakes on iPhone); text fades in with CSS instead
+      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) { el.classList.toggle('t-in', reduce || p >= parseFloat(el.getAttribute(txtAttr))); });
+      return;
+    }
     if (img) img.style.transform = 'scale(' + (1.28 - 0.28 * p).toFixed(4) + ')';
     sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) {
       var t = reduce ? 1 : clamp((p - parseFloat(el.getAttribute(txtAttr))) / 0.1);
@@ -562,7 +568,7 @@
   function onScroll() {
     ticking = false;
     var vh = window.innerHeight;
-    if (!reduce) scenes.forEach(function (sc) {
+    if (!reduce && !TOUCH) scenes.forEach(function (sc) {
       var r = sc.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) return;
       var off = r.top + r.height / 2 - vh / 2;
