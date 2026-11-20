@@ -798,3 +798,20 @@ html.nopin [data-haldi],html.nopin [data-wedding]{height:auto!important}
 html.nopin [data-haldi]>div,html.nopin [data-wedding]>div{position:relative!important;top:auto!important;height:100vh!important;height:100svh!important;min-height:640px;transform:none!important;will-change:auto!important}
 html.nopin [data-ht],html.nopin [data-wt]{opacity:0!important;transform:translateY(16px)!important;transition:opacity .8s ease var(--dl,0s),transform .8s cubic-bezier(.2,.8,.2,1) var(--dl,0s)!important}
 html.nopin .ev-in [data-ht],html.nopin .ev-in [data-wt]{opacity:1!important;transform:none!important}
+
+/* "tap for music" pill, shown only if the envelope was swiped open (browsers need a tap before sound) */
+.bgm-hint{position:fixed;z-index:45;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;transition:opacity .5s ease,transform .5s ease;
+  display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid rgba(212,182,121,.6);background:rgba(42,9,16,.92);color:#F1EADC;font:500 13px Jost,Mukta,sans-serif;letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 20px -8px rgba(0,0,0,.6)}
+.bgm-hint.show{opacity:1;transform:translate(-50%,0)}
+.bgm-hint .bgm-n{color:#D4B679;font-size:16px}
+/* phones: the envelope runs edge to edge */
+@media (max-width:600px){
+  [data-k="env"]{padding-left:0!important;padding-right:0!important}
+  [data-k="env-bob"]{width:100vw!important;max-width:none!important}
+}
+/* phones: haldi & wedding photo stays put while you scroll (fixed layer clipped to its section; no sticky, no JS, so no shaking) */
+html.nopin [data-haldi]>div,html.nopin [data-wedding]>div{height:170vh!important;height:170svh!important;min-height:0!important;overflow:visible!important;
+  -webkit-clip-path:inset(0);clip-path:inset(0);background:#3A0D16!important}
+html.nopin [data-haldi]>div>*,html.nopin [data-wedding]>div>*{position:fixed!important}
+html.nopin [data-haldi]>div>img,html.nopin [data-wedding]>div>img{top:0!important;left:0!important;width:100%!important;height:100vh!important;height:100lvh!important;transform:none!important}
+html.nopin [data-haldi]>div>div:nth-child(2),html.nopin [data-wedding]>div>div:nth-child(2){top:0!important;left:0!important;right:0!important;bottom:auto!important;height:100vh!important;height:100svh!important}

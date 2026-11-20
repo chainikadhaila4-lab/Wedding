@@ -493,6 +493,7 @@
   (function () {
     var au = document.getElementById('bgm'), btn = document.querySelector('.bgm-btn'); if (!au || !btn) return;
     var MAX = 0.1, want = true, fadeT = 0;
+    try { au.preload = 'auto'; au.load(); } catch (e) {}
     try { if (localStorage.getItem('ca-music') === 'off') want = false; } catch (e) {}
     au.addEventListener('error', function () { btn.classList.add('nofile'); });   // no music file uploaded yet: hide the button
     function fade(to, ms, done) {
@@ -507,6 +508,19 @@
       try { localStorage.setItem('ca-music', want ? 'on' : 'off'); } catch (err) {}
     });
     // browsers only allow sound after a tap or click: start on the first one (e.g. tapping the envelope)
+    var hint = document.querySelector('.bgm-hint');
+    function hideHint() { if (hint) { hint.classList.remove('show'); setTimeout(function () { hint.hidden = true; }, 500); } }
+    au.addEventListener('playing', hideHint);
+    // if the envelope was opened with a swipe (no tap), sound is still blocked: show a small "tap for music" pill
+    var hintT = setInterval(function () {
+      if (!document.body.classList.contains('opened')) return;
+      clearInterval(hintT);
+      if (hint && want && au.paused && !btn.classList.contains('nofile')) {
+        hint.hidden = false; requestAnimationFrame(function () { hint.classList.add('show'); });
+        setTimeout(hideHint, 9000);
+      }
+    }, 400);
+    if (hint) hint.addEventListener('click', function (e) { e.stopPropagation(); want = true; on(); hideHint(); });
     function first() { if (want && au.paused) on(); ['click', 'touchend', 'keydown'].forEach(function (ev) { window.removeEventListener(ev, first, true); }); }
     ['click', 'touchend', 'keydown'].forEach(function (ev) { window.addEventListener(ev, first, true); });
     document.addEventListener('visibilitychange', function () { if (document.hidden && !au.paused) au.pause(); else if (!document.hidden && want && au.paused && btn.getAttribute('aria-pressed') === 'true') au.play().catch(function () {}); });
@@ -582,7 +596,7 @@
       var attr = sec.hasAttribute('data-haldi') ? 'data-ht' : 'data-wt';
       sec.querySelectorAll('[' + attr + ']').forEach(function (el) { el.style.setProperty('--dl', (parseFloat(el.getAttribute(attr)) * 3).toFixed(2) + 's'); });
       if ('IntersectionObserver' in window && !reduce) {
-        var o = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { sec.classList.add('ev-in'); o.disconnect(); } }, { threshold: 0, rootMargin: '0px 0px -35% 0px' });
+        var o = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { sec.classList.add('ev-in'); o.disconnect(); } }, { threshold: 0, rootMargin: '0px 0px -80% 0px' });
         o.observe(sec);
       } else sec.classList.add('ev-in');
     });
