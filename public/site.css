@@ -772,10 +772,21 @@ body.locked:not(.opening) #app>section:not([data-k]),body.locked:not(.opening) #
 
 /* iPhone: pinned scenes use the LARGE viewport height, so they don't resize (and jump) when Safari's toolbar hides/shows while scrolling */
 @media (pointer:coarse){
-  .th-stick,[data-haldi]>div,[data-wedding]>div{height:100vh!important;height:100lvh!important}
+  /* (reverted: lvh heights made the haldi and wedding scenes worse on iPhone; back to the version 10-11 sizing) */
   #petals{display:none!important}
   .petal{animation:none!important}
 }
 @media (pointer:coarse){
   [data-k="nav"]{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgb(42,9,16)!important}
+}
+
+/* haldi ends in maroon, so the wedding day starts from maroon too (no white flash between them) */
+[data-wedding]{position:relative}
+[data-wedding]::before{content:"";position:absolute;left:0;right:0;top:-1px;height:220px;z-index:3;pointer-events:none;background:linear-gradient(#3A0D16,rgba(58,13,22,0))}
+
+/* haldi & wedding: pinned like version 20, but shorter on phones and on their own GPU layer so iPhone scrolls them smoothly */
+@media (pointer:coarse){
+  [data-haldi],[data-wedding]{height:170vh!important;height:170svh!important}
+  [data-haldi]>div,[data-wedding]>div{-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+  [data-hz],[data-wz]{transform:none!important;will-change:auto!important}
 }

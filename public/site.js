@@ -626,7 +626,7 @@
       es.forEach(function (e) {
         if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'none'; io.unobserve(e.target); }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
     rev.forEach(function (el) {
       var d = (el.dataset.reveal || 0) + 'ms';
       el.style.opacity = '0';
