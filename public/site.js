@@ -139,7 +139,6 @@
     // dive in: the envelope rushes past the camera and the Two homes scene settles into view, layer by layer
     later(function () {
       var SOFT = 'cubic-bezier(.45,0,.2,1)', OUT2 = 'cubic-bezier(.2,.8,.2,1)';
-      body.classList.add('diving');
       window.scrollTo(0, 0);
       var stick = document.querySelector('.th-stick'), names = [].slice.call(document.querySelectorAll('.th-names > *'));
       var bank = document.querySelector('.th-bank'), lv = document.querySelectorAll('.th-leaf'), ttl = document.querySelector('.th-title');
@@ -152,7 +151,7 @@
         K('envsec').style.display = 'none'; env.style.pointerEvents = 'none';
         K('invite').style.transform = 'none';
         K('nav').style.transform = 'translateY(0)';
-        body.classList.remove('locked', 'opening', 'diving'); body.classList.add('opened');
+        body.classList.remove('locked', 'opening'); body.classList.add('opened');
         if (ttl) anim(ttl, [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, easing: OUT2, fill: 'none' });
         names.forEach(function (n, i) { anim(n, [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 600 + i * 220, easing: OUT2, fill: 'backwards' }); });
         petals();
@@ -215,36 +214,11 @@
     function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
-    var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    if (TCH) {
-      sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); });
-      // phones: the scene is one normal screen; once it's in view the families arrive on a timer, then meet as one
-      var played = false;
-      function playHomes() {
-        if (played) return; played = true;
-        pols.forEach(function (el) { var d = (el.dataset.s === 'bride' ? 0 : 1300) + (+el.dataset.n) * 350; setTimeout(function () { el.classList.add('in'); }, reduce ? 0 : d); });
-        tags.forEach(function (t, i) { setTimeout(function () { t.classList.add('in'); }, reduce ? 0 : i * 1300); });
-        setTimeout(function () { sec.classList.add('joined'); tags.forEach(function (t) { t.classList.remove('in'); }); }, reduce ? 0 : 3600);
-      }
-      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { if (es[0].isIntersecting && document.body.classList.contains('opened')) playHomes(); }, { threshold: 0.5 }).observe(sec);
-      else playHomes();
-      var chk = setInterval(function () { if (document.body.classList.contains('opened')) { clearInterval(chk); var r0 = sec.getBoundingClientRect(); if (r0.top < window.innerHeight * 0.5 && r0.bottom > 0) setTimeout(playHomes, 600); } }, 300);
-    }
     function upd() {
       tk = false;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       var p = c01(-r.top / span);
-      if (TCH) return;
-      if (false) {   // (old phone path, replaced by the timed reveal above)
-        // add-only with hysteresis, so iPhone's elastic scrolling can't flip things back and forth
-        if (p < 0.03) { pols.forEach(function (el) { el.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); return; }
-        pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; if (p > 0.1 + k + (+el.dataset.n) * 0.06) el.classList.add('in'); });
-        if (p > 0.7) sec.classList.add('joined'); else if (p < 0.6) sec.classList.remove('joined');
-        var j = sec.classList.contains('joined');
-        tags.forEach(function (t, i) { if (j) t.classList.remove('in'); else if (p > 0.1 + i * 0.22) t.classList.add('in'); });
-        return;
-      }
       var fade = c01((p - 0.28) / 0.12);
       calls.forEach(function (el) { el.style.opacity = el.classList.contains('on') ? String(1 - fade) : ''; });
       // 1) each side arrives on its own: bride's family from the left, then the groom's from the right
@@ -426,7 +400,7 @@
   /* ---------------- marigold garlands carry you from Our Story into the celebrations ---------------- */
   (function () {
     var sec = document.querySelector('.mg'); if (!sec) return;
-    var box = sec.querySelector('.mg-str'), bg = sec.querySelector('.mg-bg'), stick = sec.querySelector('.mg-stick'), story = document.getElementById('story') || document.getElementById('top');
+    var box = sec.querySelector('.mg-str'), bg = sec.querySelector('.mg-bg'), stick = sec.querySelector('.mg-stick'), story = document.getElementById('story');
     var NS = 'http://www.w3.org/2000/svg';
     // one ruffled marigold, built once as a symbol and reused
     var defs = document.createElementNS(NS, 'svg'); defs.setAttribute('width', 0); defs.setAttribute('height', 0); defs.style.position = 'absolute';
@@ -443,50 +417,81 @@
     });
     g += '<circle r="5" fill="#C9700C"/></symbol>';
     defs.innerHTML = g; document.body.appendChild(defs);
-    // a burst of marigolds when the haldi scene arrives: one painted flower bitmap, ~30 copies thrown out with GPU-only animations
-    var flowerURL = null;
+    var strands = [], flower = null;
+    // draw the marigold once into a bitmap, then paint each garland as ONE pre-rendered image (no per-flower DOM)
     (function () {
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="-50 -50 100 100">' + defs.innerHTML.replace('<symbol id="mgf" viewBox="-50 -50 100 100">', '<g>').replace('</symbol>', '</g>') + '</svg>';
       var im = new Image();
-      im.onload = function () {
-        var cv = document.createElement('canvas'); cv.width = cv.height = 160;
-        var x = cv.getContext('2d'); x.shadowColor = 'rgba(60,20,0,.35)'; x.shadowBlur = 6; x.shadowOffsetY = 4; x.drawImage(im, 8, 6, 144, 144); flowerURL = cv.toDataURL('image/png');
-      };
+      im.onload = function () { flower = im; build(); };
       im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     })();
-    box.innerHTML = '';
-    var busyG = false;
-    function burst() {
-      if (busyG || !flowerURL || reduce) return; busyG = true;
-      sec.classList.add('on');
-      var W = window.innerWidth, H = window.innerHeight, n = W < 600 ? 28 : 40, ox = W / 2, oy = H * 0.42, longest = 0;
-      for (var i = 0; i < n; i++) {
-        var f = document.createElement('img'); f.src = flowerURL; f.alt = ''; f.className = 'mg-f';
-        var sz = 38 + Math.random() * 40; f.style.width = f.style.height = sz.toFixed(0) + 'px';
-        f.style.left = (ox - sz / 2).toFixed(0) + 'px'; f.style.top = (oy - sz / 2).toFixed(0) + 'px';
-        box.appendChild(f);
-        var ang = (i / n) * Math.PI * 2 + Math.random() * 0.4, dist = (0.28 + Math.random() * 0.42) * Math.max(W, H * 0.7);
-        var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist * 0.8, rot = (Math.random() * 2 - 1) * 540, dur = 1900 + Math.random() * 900;
-        longest = Math.max(longest, dur);
-        f.animate([
-          { transform: 'translate3d(0,0,0) scale(.2) rotate(0deg)', opacity: 1 },
-          { transform: 'translate3d(' + (dx * 0.55).toFixed(0) + 'px,' + (dy * 0.55 - 30).toFixed(0) + 'px,0) scale(1) rotate(' + (rot * 0.4).toFixed(0) + 'deg)', opacity: 1, offset: 0.25 },
-          { transform: 'translate3d(' + (dx * 0.9).toFixed(0) + 'px,' + (dy * 0.9 + H * 0.25).toFixed(0) + 'px,0) scale(.95) rotate(' + (rot * 0.8).toFixed(0) + 'deg)', opacity: 1, offset: 0.7 },
-          { transform: 'translate3d(' + dx.toFixed(0) + 'px,' + (dy + H * 0.45).toFixed(0) + 'px,0) scale(.85) rotate(' + rot.toFixed(0) + 'deg)', opacity: 0 }
-        ], { duration: dur, easing: 'cubic-bezier(.15,.7,.35,1)', fill: 'forwards' });
+    function tile(fs, seed) {
+      var dpr = Math.min(2, window.devicePixelRatio || 1), step = fs * 0.62, n = 9, w = Math.ceil(fs * 1.1), h = Math.ceil(step * n);
+      var cv = document.createElement('canvas'); cv.width = w * dpr; cv.height = h * dpr;
+      var x = cv.getContext('2d'); x.scale(dpr, dpr);
+      x.strokeStyle = 'rgba(120,70,20,.5)'; x.lineWidth = 1; x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.stroke();
+      x.shadowColor = 'rgba(60,20,0,.35)'; x.shadowBlur = 4; x.shadowOffsetY = 3;
+      for (var k = -1; k <= n; k++) {
+        var cy = k * step + step / 2, sc = 0.92 + ((k + seed + 9) % 3) * 0.05, s = fs * sc;
+        x.save(); x.translate(w / 2, cy); x.rotate(((k * 47 + seed * 23) % 360) * Math.PI / 180);
+        x.drawImage(flower, -s / 2, -s / 2, s, s); x.restore();
+        var q = ((k + 9) + seed * 3) % 9;
+        if (q === 4) { var g = x.createRadialGradient(w / 2 - 2, cy + step / 2 - 2, 1, w / 2, cy + step / 2, fs * 0.13); g.addColorStop(0, '#FFD9DF'); g.addColorStop(0.6, '#C2183A'); g.addColorStop(1, '#7A0A20'); x.fillStyle = g; x.beginPath(); x.arc(w / 2, cy + step / 2, fs * 0.12, 0, 7); x.fill(); }
+        else if (q === 8) { x.fillStyle = '#4E7A2C'; x.beginPath(); x.ellipse(w / 2 + fs * 0.12, cy + step / 2, fs * 0.24, fs * 0.09, -0.5, 0, 7); x.fill(); }
       }
-      setTimeout(function () { box.innerHTML = ''; sec.classList.remove('on'); busyG = false; }, longest + 100);
+      return { url: cv.toDataURL('image/png'), w: w, h: h };
     }
-    var hal = document.querySelector('[data-haldi]');
+    var secTop = 0, secH = 1, storyBot = 0;
+    function measure() { var sy = window.scrollY; secTop = sec.getBoundingClientRect().top + sy; secH = sec.offsetHeight; storyBot = story.getBoundingClientRect().bottom + sy; }
+    window.addEventListener('load', function () { measure(); upd(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); });
+    var near = false;
+    window.addEventListener('resize', function () { measure(); upd(); });
+    function build() {
+      if (!flower) return;
+      measure();
+      box.innerHTML = ''; strands = [];
+      var W = box.clientWidth, H = box.clientHeight;
+      var cols = W < 600 ? 9 : 15, w = W / cols, fs = w * 1.25;
+      var tiles = [tile(fs, 0), tile(fs, 1), tile(fs, 2)];
+      for (var c = 0; c < cols; c++) {
+        var t = tiles[c % 3], s = document.createElement('div'); s.className = 'mg-s';
+        s.style.left = (c * w + w / 2 - t.w / 2).toFixed(1) + 'px'; s.style.width = t.w + 'px'; s.style.height = (H + 80) + 'px';
+        s.style.backgroundImage = 'url(' + t.url + ')'; s.style.backgroundSize = t.w + 'px ' + t.h + 'px';
+        s.style.backgroundPosition = '0 ' + (-((c * 37) % 60)) + 'px';
+        box.appendChild(s);
+        var mid = (c + 0.5) / cols - 0.5, dd = Math.abs(mid);
+        s.style.setProperty('--d', ((0.5 - dd) * 0.9).toFixed(2) + 's');
+        s.style.setProperty('--x', ((mid < 0 ? -1 : 1) * (60 + dd * 90)).toFixed(1) + 'vw');
+        strands.push({ el: s, c: c, mid: mid, d: dd });
+      }
+      upd();
+    }
+    function c01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function eo(x) { return 1 - Math.pow(1 - x, 3); }
+    function eio(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+    // garlands are a fixed overlay that plays a short CSS sweep when the haldi scene arrives (no sticky maths, no scroll-scrubbing)
+    var hal = document.querySelector('[data-haldi]'), busyG = false, lastY = window.scrollY;
+    function play() {
+      if (busyG) return; busyG = true;
+      sec.classList.remove('open'); sec.classList.add('on');
+      requestAnimationFrame(function () { requestAnimationFrame(function () { sec.classList.add('fall'); }); });
+      setTimeout(function () { sec.classList.add('open'); }, reduce ? 0 : 1900);
+      setTimeout(function () { sec.classList.remove('on', 'fall', 'open'); busyG = false; }, reduce ? 50 : 3600);
+    }
+    function upd() {}
     if (hal && 'IntersectionObserver' in window) {
       var armed = true;
+      window.addEventListener('scroll', function () { lastY = window.scrollY; }, { passive: true });
       new IntersectionObserver(function (es) {
         es.forEach(function (e) {
-          if (e.isIntersecting && armed && e.boundingClientRect.top > 0) { armed = false; burst(); }
-          if (!e.isIntersecting && e.boundingClientRect.top > 0) armed = true;
+          var goingDown = e.boundingClientRect.top > 0;   // haldi entering from below
+          if (e.isIntersecting && armed && goingDown) { armed = false; play(); }
+          if (!e.isIntersecting && e.boundingClientRect.top > 0) armed = true;   // scrolled back above it: allow again
         });
-      }, { threshold: 0, rootMargin: '0px 0px -45% 0px' }).observe(hal);
+      }, { threshold: 0.12 }).observe(hal);
     }
+    var rt, lw = window.innerWidth; window.addEventListener('resize', function () { if (window.innerWidth === lw) return; lw = window.innerWidth; clearTimeout(rt); rt = setTimeout(build, 200); });
   })();
 
   /* ---------------- soft background music: starts with the first tap, fades in quietly, toggle in the top bar ---------------- */
@@ -531,7 +536,6 @@
   var colors = [['#FFB347','#E8731A'], ['#FFD25C','#F2A019'], ['#F28C28','#C8571B'], ['#E2557F','#A61E4D'], ['#FFFFFF','#EADBC8'], ['#F7A8C0','#D96A92']];
   function petals() {
     if (reduce) return;
-    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;   // phones: no falling petals (keeps scrolling smooth)
     var n = window.innerWidth < 640 ? 30 : 44;
     for (var i = 0; i < n; i++) {
       var p = document.createElement('span'); p.className = 'petal';
@@ -589,30 +593,14 @@
     var r = sec.getBoundingClientRect();
     return clamp(-r.top / Math.max(1, r.height - window.innerHeight));
   }
-  if (TOUCH) {
-    document.documentElement.classList.add('nopin');
-    [haldi, wed].forEach(function (sec) {
-      if (!sec) return;
-      var attr = sec.hasAttribute('data-haldi') ? 'data-ht' : 'data-wt';
-      sec.querySelectorAll('[' + attr + ']').forEach(function (el) { el.style.setProperty('--dl', (parseFloat(el.getAttribute(attr)) * 3).toFixed(2) + 's'); });
-      if ('IntersectionObserver' in window && !reduce) {
-        var o = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { sec.classList.add('ev-in'); o.disconnect(); } }, { threshold: 0, rootMargin: '0px 0px -80% 0px' });
-        o.observe(sec);
-      } else sec.classList.add('ev-in');
-    });
-  }
   function stickyScene(sec, imgSel, txtAttr) {
-    if (TOUCH) return;
     if (!sec) return;
     var r = sec.getBoundingClientRect(), vh = window.innerHeight;
     if (r.bottom < -50 || r.top > vh + 50) return;
     var p = prog(sec);
     var img = sec.querySelector(imgSel);
     if (TOUCH) {   // phones: no per-frame motion inside pinned scenes (it shakes on iPhone); text fades in with CSS instead
-      var back = r.top > vh * 0.4;   // scrolled back above the scene: reset; otherwise only ever add (no flicker from iPhone's bounce)
-      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) {
-        if (back) el.classList.remove('t-in'); else if (reduce || p >= parseFloat(el.getAttribute(txtAttr))) el.classList.add('t-in');
-      });
+      sec.querySelectorAll('[' + txtAttr + ']').forEach(function (el) { el.classList.toggle('t-in', reduce || p >= parseFloat(el.getAttribute(txtAttr))); });
       return;
     }
     if (img) img.style.transform = 'scale(' + (1.28 - 0.28 * p).toFixed(4) + ')';
@@ -649,7 +637,7 @@
     stickyScene(haldi, '[data-hz]', 'data-ht');
     stickyScene(wed, '[data-wz]', 'data-wt');
     var h = document.documentElement.scrollHeight - vh;
-    if (!TOUCH) thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
+    thread.style.transform = 'scaleX(' + (h > 0 ? clamp(window.scrollY / h) : 0).toFixed(4) + ')';
     var cur = -1;
     targets.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < vh * 0.4) cur = i; });
     links.forEach(function (a, i) { a.classList.toggle('active', i === cur); });
@@ -668,7 +656,7 @@
       es.forEach(function (e) {
         if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'none'; io.unobserve(e.target); }
       });
-    }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: 0.12 });
     rev.forEach(function (el) {
       var d = (el.dataset.reveal || 0) + 'ms';
       el.style.opacity = '0';
