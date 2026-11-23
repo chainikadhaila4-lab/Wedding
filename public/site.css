@@ -692,9 +692,9 @@ img,svg,video,iframe{max-width:100%}
 @media (pointer:coarse){[data-flow],.th-art{transform:none!important;opacity:1!important}}
 
 @media (pointer:coarse){
-  [data-hz],[data-wz]{transform:scale(1.06)!important}
-  [data-ht],[data-wt]{opacity:0!important;transform:translateY(16px)!important;transition:opacity .7s ease,transform .7s ease!important}
-  [data-ht].t-in,[data-wt].t-in{opacity:1!important;transform:none!important}
+  html:not(.sda) [data-hz],html:not(.sda) [data-wz]{transform:scale(1.06)!important}
+  html:not(.sda) [data-ht],html:not(.sda) [data-wt]{opacity:0!important;transform:translateY(16px)!important;transition:opacity .7s ease,transform .7s ease!important}
+  html:not(.sda) [data-ht].t-in,html:not(.sda) [data-wt].t-in{opacity:1!important;transform:none!important}
   .mg-bg{display:none}
 }
 @media (pointer:coarse){
@@ -774,8 +774,8 @@ body.locked:not(.diving) #app>section:not([data-k]),body.locked:not(.diving) #ap
 
 /* phones: haldi & wedding photos zoom out smoothly once when the scene arrives */
 @media (pointer:coarse){
-  [data-hz],[data-wz]{transform:scale(1.28)!important;transform-origin:50% 88%;transition:transform 3.2s cubic-bezier(.25,.6,.25,1)!important;will-change:transform}
-  .zin [data-hz],.zin [data-wz]{transform:scale(1)!important}
+  html:not(.sda) [data-hz],html:not(.sda) [data-wz]{transform:scale(1.28)!important;transform-origin:50% 88%;transition:transform 3.2s cubic-bezier(.25,.6,.25,1)!important;will-change:transform}
+  html:not(.sda) .zin [data-hz],html:not(.sda) .zin [data-wz]{transform:scale(1)!important}
 }
 
 /* ===== booth and marigolds removed: Our Story is four simple polaroids, nothing pinned or snapping ===== */
@@ -854,21 +854,65 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
 /* let the Celebrations break flow into the card above and the haldi photo below */
 #events > div:nth-child(3) > div:first-child{background:linear-gradient(180deg,#E8E3DA 0%,#EFE4D3 45%,#E6D3B5 100%)!important;z-index:5;padding-bottom:30px!important}
 #events > div:nth-child(3) > div:first-child::after{content:"";position:absolute;left:0;right:0;top:100%;height:110px;pointer-events:none;background:linear-gradient(180deg,#E6D3B5 0%,rgba(230,211,181,.7) 35%,rgba(230,211,181,0) 100%)}
-/* no overlay on top of the pinned haldi photo (caused flicker on iPhone) */
+/* no overlay on top of the pinned haldi photo */
 #events > div:nth-child(3) > div:first-child{z-index:auto!important;padding-bottom:40px!important}
 #events > div:nth-child(3) > div:first-child::after{content:none!important;display:none!important}
-/* ===== iPhone calm mode: nothing pinned, nothing zooming with the scroll ===== */
-html.ios [data-haldi],html.ios [data-wedding]{height:auto!important}
-html.ios [data-haldi] > div:first-child,html.ios [data-wedding] > div:first-child{position:relative!important;height:100vh!important;height:100svh!important}
-html.ios [data-hz],html.ios [data-wz]{transform:none!important;transition:none!important;will-change:auto!important}
-html.ios [data-ht],html.ios [data-wt]{opacity:1!important;transform:none!important;transition:none!important}
-html.ios #homes.th{height:auto!important}
-html.ios .th-stick{position:relative!important;height:100vh!important;height:100svh!important}
-html.ios .th-art{transform:none!important;will-change:auto!important}
-html.ios [data-flow]{transform:none!important;opacity:1!important}
-html.ios nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-/* iPhone: bring the motion back, as one-time timed animations */
-html.ios [data-hz],html.ios [data-wz]{transform:scale(1.18)!important;transition:transform 3s cubic-bezier(.25,.6,.25,1)!important;will-change:transform!important}
-html.ios .ios-in [data-hz],html.ios .ios-in [data-wz]{transform:scale(1)!important}
-html.ios [data-ht],html.ios [data-wt]{opacity:0!important;transform:translateY(18px)!important;transition:opacity .9s ease var(--d,0s),transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s)!important}
-html.ios .ios-in [data-ht],html.ios .ios-in [data-wt]{opacity:1!important;transform:none!important}
+
+/* ==========================================================================
+   MOTION ENGINE (scroll-driven animations)
+   The browser itself runs these in step with the finger, so nothing lags or
+   shakes on iPhone. Same choreography as before:
+   - haldi & wedding pin, the photo zooms out, the text arrives line by line
+   - two homes pins, bride's family arrives, then groom's, then they join
+   Browsers without support keep the older script-driven version.
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+  html.sda [data-haldi]{view-timeline:--haldi block}
+  html.sda [data-wedding]{view-timeline:--wed block}
+  html.sda #homes.th{view-timeline:--homes block}
+
+  @keyframes m-zoom{from{transform:scale(1.28)}to{transform:scale(1)}}
+  @keyframes m-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  html.sda [data-hz],html.sda [data-wz]{will-change:transform;animation:m-zoom linear both;animation-range:contain 0% contain 100%}
+  html.sda [data-hz]{animation-timeline:--haldi}
+  html.sda [data-wz]{animation-timeline:--wed}
+
+  html.sda [data-ht],html.sda [data-wt]{animation:m-rise linear both}
+  html.sda [data-ht]{animation-timeline:--haldi}
+  html.sda [data-wt]{animation-timeline:--wed}
+  html.sda :is([data-ht="0"],[data-wt="0"]){animation-range:contain 0% contain 10%}
+  html.sda :is([data-ht="0.07"],[data-wt="0.07"]){animation-range:contain 7% contain 17%}
+  html.sda :is([data-ht="0.12"],[data-wt="0.12"]){animation-range:contain 12% contain 22%}
+  html.sda :is([data-ht="0.24"],[data-wt="0.24"]){animation-range:contain 24% contain 34%}
+  html.sda :is([data-ht="0.28"],[data-wt="0.28"]){animation-range:contain 28% contain 38%}
+  html.sda :is([data-ht="0.36"],[data-wt="0.36"]){animation-range:contain 36% contain 46%}
+  html.sda :is([data-ht="0.48"],[data-wt="0.48"]){animation-range:contain 48% contain 58%}
+
+  /* two homes */
+  @keyframes m-pol{from{opacity:0;transform:translate(var(--dx),40px) scale(.9) rotate(calc(var(--r) + var(--dr)))}to{opacity:1;transform:rotate(var(--r))}}
+  @keyframes m-tag0{0%,10%{opacity:0}18%,66%{opacity:1}69%,100%{opacity:0}}
+  @keyframes m-tag1{0%,32%{opacity:0}40%,66%{opacity:1}69%,100%{opacity:0}}
+  @keyframes m-joinb{from{transform:none}to{transform:translateX(26%) scale(.9)}}
+  @keyframes m-joing{from{transform:none}to{transform:translateX(-26%) scale(.9)}}
+  @keyframes m-one{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  html.sda #homes .th-pol{animation:m-pol cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes}
+  html.sda #homes .th-pol[data-s="bride"]{--dx:-55%;--dr:-8deg}
+  html.sda #homes .th-pol[data-s="groom"]{--dx:55%;--dr:8deg}
+  html.sda #homes .th-pol[data-s="bride"][data-n="0"]{--r:-6deg;animation-range:contain 12% contain 26%}
+  html.sda #homes .th-pol[data-s="bride"][data-n="1"]{--r:4deg;animation-range:contain 18% contain 32%}
+  html.sda #homes .th-pol[data-s="bride"][data-n="2"]{--r:-3deg;animation-range:contain 24% contain 38%}
+  html.sda #homes .th-pol[data-s="groom"][data-n="0"]{--r:5deg;animation-range:contain 36% contain 50%}
+  html.sda #homes .th-pol[data-s="groom"][data-n="1"]{--r:-4deg;animation-range:contain 42% contain 56%}
+  html.sda #homes .th-pol[data-s="groom"][data-n="2"]{--r:3deg;animation-range:contain 48% contain 62%}
+  html.sda #homes .th-col{animation:m-joinb cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
+  html.sda #homes .th-col.g{animation-name:m-joing}
+  html.sda #homes .th-col.b .th-tag{animation:m-tag0 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
+  html.sda #homes .th-col.g .th-tag{animation:m-tag1 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
+  html.sda #homes .th-one{animation:m-one cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
+
+  @media (prefers-reduced-motion: reduce){
+    html.sda [data-hz],html.sda [data-wz],html.sda [data-ht],html.sda [data-wt],html.sda #homes .th-pol,html.sda #homes .th-one{animation:none;opacity:1;transform:none}
+  }
+}
