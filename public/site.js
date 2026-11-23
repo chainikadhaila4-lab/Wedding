@@ -7,6 +7,9 @@
   // motion engine: browsers that support scroll-driven animations run the scenes in CSS (smooth on iPhone)
   var SDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
   if (SDA) document.documentElement.classList.add('sda');
+  // iPhone/iPad: Safari's sticky pinning shakes as its toolbar resizes, so haldi & wedding play while scrolling past instead of pinning
+  var IOSDEV = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (SDA && IOSDEV) document.documentElement.classList.add('nopin');
   var K = function (k) { return app.querySelector('[data-k="' + k + '"]'); };
   var EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
   var OUT = 'cubic-bezier(0.2, 0.7, 0.2, 1)';

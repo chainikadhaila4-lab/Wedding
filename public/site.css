@@ -916,3 +916,20 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
     html.sda [data-hz],html.sda [data-wz],html.sda [data-ht],html.sda [data-wt],html.sda #homes .th-pol,html.sda #homes .th-one{animation:none;opacity:1;transform:none}
   }
 }
+
+/* iPhone (html.nopin): same zoom and line-by-line text, but driven while the scene scrolls past, with no sticky pinning */
+@supports (animation-timeline: view()) {
+  html.sda.nopin [data-haldi],html.sda.nopin [data-wedding]{height:auto!important}
+  html.sda.nopin [data-haldi] > div:first-child,html.sda.nopin [data-wedding] > div:first-child{position:relative!important;height:100lvh!important;view-timeline:--scene block}
+  html.sda.nopin [data-haldi]{view-timeline:none}
+  html.sda.nopin [data-wedding]{view-timeline:none}
+  html.sda.nopin [data-hz],html.sda.nopin [data-wz]{animation-timeline:--scene;animation-range:entry 0% exit 60%}
+  html.sda.nopin [data-ht],html.sda.nopin [data-wt]{animation-timeline:--scene}
+  html.sda.nopin :is([data-ht="0"],[data-wt="0"]){animation-range:entry 35% entry 55%}
+  html.sda.nopin :is([data-ht="0.07"],[data-wt="0.07"]){animation-range:entry 42% entry 62%}
+  html.sda.nopin :is([data-ht="0.12"],[data-wt="0.12"]){animation-range:entry 48% entry 68%}
+  html.sda.nopin :is([data-ht="0.24"],[data-wt="0.24"]){animation-range:entry 56% entry 76%}
+  html.sda.nopin :is([data-ht="0.28"],[data-wt="0.28"]){animation-range:entry 62% entry 82%}
+  html.sda.nopin :is([data-ht="0.36"],[data-wt="0.36"]){animation-range:entry 70% entry 90%}
+  html.sda.nopin :is([data-ht="0.48"],[data-wt="0.48"]){animation-range:entry 78% entry 98%}
+}
