@@ -1135,3 +1135,118 @@ html[lang="hi"] .bk-t,html[lang="mr"] .bk-t{font:400 22px/1.5 'Tiro Devanagari H
 .br-haldi.play .br-mari{animation:brShower var(--t,3.2s) cubic-bezier(.35,.05,.6,1) var(--d,0s) forwards!important}
 @keyframes brShower{0%{opacity:0;transform:translate(0,0) rotate(0)}8%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translate(var(--sw,20px),var(--fall,520px)) rotate(var(--r,360deg))}}
 #events > div:nth-child(3) > div:first-child.play .br-mari{animation:brShower var(--t,3.2s) cubic-bezier(.35,.05,.6,1) var(--d,0s) forwards!important}
+
+/* ===== flow, not slides ===== */
+/* 1. Two homes -> card: the card section slides up over the end of the Two homes scene, its top a soft fade */
+#top{margin-top:-30vh!important;margin-top:-30svh!important;z-index:5!important;padding-top:calc(30svh + 40px)!important;
+  background:linear-gradient(rgba(242,238,229,0) 0,rgba(242,238,229,.75) 18svh,#F2EEE5 30svh)!important}
+#homes .th-stick::after{display:none!important}
+/* 2. card -> Celebrations -> haldi: one continuous cream wash, no edge */
+#events > div:nth-child(3) > div:first-child{margin-top:-1px!important;background:linear-gradient(180deg,#F2EEE5 0%,#F0E6D6 40%,#E9D8BC 100%)!important}
+/* 3. marigolds fall across the whole screen (a fixed layer), so they drift through both sections */
+.mari-rain{position:fixed;inset:0;z-index:38;pointer-events:none;overflow:hidden}
+.mari-rain .br-mari{top:-50px!important;animation:none;opacity:0}
+.mari-rain.play .br-mari{animation:brRain var(--t,4.2s) linear var(--d,0s) forwards!important}
+@keyframes brRain{0%{opacity:0;transform:translate(0,0) rotate(0)}6%{opacity:1}25%{transform:translate(calc(var(--sw) * .6),calc(var(--fall) * .25)) rotate(calc(var(--r) * .25))}50%{transform:translate(calc(var(--sw) * -.3),calc(var(--fall) * .5)) rotate(calc(var(--r) * .5))}75%{transform:translate(calc(var(--sw) * .5),calc(var(--fall) * .75)) rotate(calc(var(--r) * .75))}90%{opacity:1}100%{opacity:0;transform:translate(0,var(--fall)) rotate(var(--r))}}
+/* phones: Two homes stays pinned while the card section rises over it like the next page */
+#homes.touch{height:400vh!important;height:400svh!important}
+#homes.touch + #top{margin-top:-100vh!important;margin-top:-100svh!important}
+.mari-rain.play .br-mari{animation-timing-function:cubic-bezier(.3,.1,.55,1)!important}
+.mari-rain .br-mari{filter:drop-shadow(0 2px 2px rgba(120,50,0,.2))}
+/* card's bottom flowers spill over into the Celebrations below instead of being clipped */
+#top{overflow:visible!important}
+#top > [data-scene]{display:none!important}
+#top > div:first-child{overflow:visible!important}
+#top .pc-corner.bl,#top .pc-corner.br{bottom:-56px!important;z-index:6}
+#top{margin-bottom:0!important;padding-bottom:20px!important}
+#events{position:relative;z-index:1}
+#top{z-index:6!important}
+/* less empty space after the gathbandhan */
+.br-knot{padding-bottom:0!important}
+html.nopin [data-wedding] > div > div:last-child,html.nopin [data-wedding] > div:first-child > div:last-child{top:24px!important}
+html:not(.nopin) .br-knot + [data-wedding]{margin-top:-80px!important}
+/* card section's bottom matches the Celebrations cream (no seam) */
+#top{background:linear-gradient(rgba(242,238,229,0) 0,rgba(242,238,229,.75) 18svh,#F2EEE5 30svh)!important}
+#top > div:first-child{background-color:#ECE7DD!important}
+/* warm ivory everywhere (no cool grey): card paper, the page around it, and the Celebrations band all share one palette */
+#top > div:first-child{background:linear-gradient(180deg,#FBF5EA 0%,#F6EEDF 100%)!important;background-color:#F8F1E4!important}
+#top{background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,.8) 18svh,#F3EADB 30svh)!important}
+#events > div:nth-child(3) > div:first-child{background:linear-gradient(180deg,#F3EADB 0%,#F0E4D0 45%,#E9D8BC 100%)!important}
+#venue [data-reveal="100"]{background:linear-gradient(180deg,#FBF5EA 0%,#F6EEDF 100%)!important}
+.br-knot{background:#F6EEE0!important}
+/* marigold shower removed (replaced by the marigold curtain on the haldi screen) */
+.mari-rain,.br-mari{display:none!important}
+/* gathbandhan screen: room for the knot's tails, and its colour melts into the wedding screen below (no edge) */
+.br-knot{padding-bottom:44px!important;overflow:visible!important;background:linear-gradient(180deg,#F6EEE0 0%,#F6EEE0 55%,#F6F2EA 100%)!important}
+.br-knot .bk-art{overflow:visible}
+[data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 22%,rgba(58,13,22,0) 80%,rgb(58,13,22) 100%)!important}
+
+/* haldi: a paper-cut garland curtain of marigolds and lotus hangs over the photo, then parts to reveal it */
+.hc-curtain{position:absolute;left:0;right:0;top:0;height:78%;z-index:4;pointer-events:none;overflow:hidden}
+.hc-curtain i{position:absolute;top:-2%;width:56%;height:104%;background:url(assets/curtain.webp) no-repeat;background-size:200% auto;filter:drop-shadow(0 6px 8px rgba(90,40,10,.25));transition:transform 2.2s cubic-bezier(.65,0,.25,1),opacity 1.4s ease .9s;will-change:transform}
+.hc-curtain .hc-l{left:0;background-position:0 0;transform-origin:0 0}
+.hc-curtain .hc-r{right:0;background-position:100% 0;transform-origin:100% 0}
+[data-haldi].hc-open .hc-l{transform:translateX(-72%) scaleX(.55)}
+[data-haldi].hc-open .hc-r{transform:translateX(72%) scaleX(.55)}
+[data-haldi].hc-open .hc-curtain i{opacity:.95}
+@media (prefers-reduced-motion: reduce){.hc-curtain i{transition:opacity 1s ease!important}[data-haldi].hc-open .hc-curtain i{opacity:0}}
+
+/* ===== The Celebrations: a paper-cut marigold & lotus curtain parts to reveal the title, and a peacock walks in ===== */
+#events > div:nth-child(3) > div:first-child{overflow:hidden!important;min-height:300px;padding-bottom:110px!important}
+.cel-cur{position:absolute;top:0;height:auto;z-index:4;pointer-events:none;transition:transform 2.2s cubic-bezier(.6,0,.25,1)}
+.cel-cur.l{left:0;width:44.6%;transform-origin:0 0}
+.cel-cur.r{right:0;width:55.4%;transform-origin:100% 0}
+#events > div:nth-child(3) > div:first-child.play .cel-cur.l{transform:translateX(-78%) rotate(-2deg)}
+#events > div:nth-child(3) > div:first-child.play .cel-cur.r{transform:translateX(80%) rotate(2deg)}
+.cel-cur.sway{animation:celSway 1.6s ease-in-out 2.1s 1}
+@keyframes celSway{0%,100%{rotate:0deg}40%{rotate:1.2deg}75%{rotate:-.6deg}}
+#events > div:nth-child(3) > div:first-child > h2,#events > div:nth-child(3) > div:first-child > .cel-d{position:relative;z-index:2;opacity:0;transform:translateY(10px);transition:opacity 1s ease 1.2s,transform 1s ease 1.2s}
+#events > div:nth-child(3) > div:first-child.play > h2,#events > div:nth-child(3) > div:first-child.play > .cel-d{opacity:1;transform:none}
+.cel-pea{position:absolute;bottom:4px;right:-62%;width:58%;max-width:300px;height:auto;z-index:3;pointer-events:none;transition:right 2.6s cubic-bezier(.3,.6,.3,1) 1.6s;filter:drop-shadow(0 6px 6px rgba(80,40,0,.15))}
+#events > div:nth-child(3) > div:first-child.play .cel-pea{right:4%}
+.cel-pea.bob{animation:celBob .9s ease-in-out 1.6s 3}
+@keyframes celBob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+@media (prefers-reduced-motion: reduce){.cel-cur{transition:opacity 1s ease!important}#events > div:nth-child(3) > div:first-child.play .cel-cur{opacity:0;transform:none!important}.cel-pea{transition:opacity 1s ease!important;right:4%!important;opacity:0}#events > div:nth-child(3) > div:first-child.play .cel-pea{opacity:1}}
+#events > div:nth-child(3) > div:first-child{padding-bottom:150px!important}
+.cel-pea{width:50%!important}
+/* gathbandhan sits on the wedding photo's own sky (mirrored upward), so the two screens are one background */
+.br-knot{background:url(assets/wedding-sky.jpg) center bottom/100% auto no-repeat,#F7F3EC!important}
+.br-knot::before{opacity:.45!important}
+[data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(rgba(58,13,22,0) 0%,rgba(58,13,22,0) 80%,rgb(58,13,22) 100%)!important}
+[data-wedding] > div:first-child{background:#F6F2EA!important}
+.br-knot{background:url(assets/wedding-sky.jpg) center bottom/cover no-repeat,#F7F3EC!important}
+.br-knot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(rgba(246,242,234,0),#F6F2EA);pointer-events:none;z-index:0}
+[data-wedding] > div:first-child::before{content:"";position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(#F6F2EA,rgba(246,242,234,0));z-index:1;pointer-events:none}
+/* Celebrations: curtain removed; a few peacocks walk in instead */
+.cel-cur{display:none!important}
+.cel-pea{display:none!important}
+.cel-pk{position:absolute;bottom:6px;height:auto;z-index:3;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 6px rgba(80,40,0,.15));transition:transform 2.6s cubic-bezier(.3,.6,.3,1),opacity .8s ease}
+#events > div:nth-child(3) > div:first-child.play .cel-pk{opacity:1}
+#events > div:nth-child(3) > div:first-child > h2,#events > div:nth-child(3) > div:first-child > .cel-d{transition-delay:.2s!important}
+#events > div:nth-child(3) > div:first-child{padding-bottom:170px!important}
+/* soft cream fades at both ends of the gathbandhan sky so it melts into the screens above and below */
+.br-knot{background:linear-gradient(#F7F3EC 0%,rgba(247,243,236,0) 30%,rgba(246,242,234,0) 82%,#F6F2EA 100%),url(assets/wedding-sky.jpg) center bottom/100% auto no-repeat,#F7F3EC!important}
+[data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 12%,rgba(58,13,22,0) 80%,rgb(58,13,22) 100%)!important}
+
+/* Celebrations: curtain removed; three paper peacocks stroll in as you scroll */
+.cel-cur{display:none!important}
+.cel-pea{display:none!important}
+.cel-pk{position:absolute;height:auto;z-index:3;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 6px rgba(80,40,0,.15))}
+.cel-pk.p1{width:44%;bottom:10px;left:-50%;transition:left 2.8s cubic-bezier(.3,.6,.3,1) .3s,opacity .6s ease .3s}
+.cel-pk.p2{width:34%;bottom:58px;right:-40%;transform:scaleX(-1);transition:right 2.6s cubic-bezier(.3,.6,.3,1) .9s,opacity .6s ease .9s}
+.cel-pk.p3{width:26%;bottom:6px;right:-30%;transform:scaleX(-1);transition:right 2.4s cubic-bezier(.3,.6,.3,1) 1.5s,opacity .6s ease 1.5s}
+#events > div:nth-child(3) > div:first-child.play .cel-pk{opacity:1}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p1{left:2%}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p2{right:6%}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p3{right:40%}
+#events > div:nth-child(3) > div:first-child.play .cel-pk{animation:celBob .8s ease-in-out 3 .3s}
+#events > div:nth-child(3) > div:first-child > h2,#events > div:nth-child(3) > div:first-child > .cel-d{transition-delay:.2s!important}
+#events > div:nth-child(3) > div:first-child{padding-bottom:170px!important}
+@media (prefers-reduced-motion: reduce){.cel-pk{transition:opacity 1s ease!important}.cel-pk.p1{left:2%!important}.cel-pk.p2{right:6%!important}.cel-pk.p3{right:40%!important}}
+/* peacocks: two facing each other at the sides, a small one behind in the middle */
+.cel-pk.p1{width:42%!important;bottom:10px!important;left:-50%;transform:scaleX(-1)!important}
+.cel-pk.p2{width:42%!important;bottom:10px!important;right:-50%;transform:none!important}
+.cel-pk.p3{width:22%!important;bottom:92px!important;right:-30%;transform:none!important;opacity:0;z-index:2}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p1{left:-4%!important}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p2{right:-4%!important}
+#events > div:nth-child(3) > div:first-child.play .cel-pk.p3{right:39%!important;opacity:.95}
