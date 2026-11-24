@@ -1394,3 +1394,31 @@ html.nopin [data-ht],html.nopin [data-wt]{animation:none!important;opacity:1!imp
 /* hairline seams between screens */
 [data-wedding]{margin-top:-2px!important}
 .br-knot{margin-bottom:-1px}
+
+/* ===== iPhone v2: no sticky at all. Each photo is a fixed layer seen through its own section window
+   (the section clips it), the text scrolls up over the photo. Nothing is pinned, so Safari's toolbar can't jitter it. ===== */
+html,body{background:#22070D!important}
+html.ios [data-haldi],html.ios [data-wedding]{height:auto!important;position:relative;clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0)}
+html.ios [data-haldi] > div:first-child,html.ios [data-wedding] > div:first-child{position:relative!important;top:auto!important;height:170lvh!important;overflow:visible!important;background:transparent!important}
+html.ios [data-hz],html.ios [data-wz],html.ios [data-haldi] > div:first-child > div:nth-child(2),html.ios [data-wedding] > div:first-child > div:nth-child(2){position:fixed!important;top:0!important;bottom:auto!important;left:max(0px,calc(50% - 240px))!important;right:auto!important;width:min(100vw,480px)!important;height:100lvh!important}
+html.ios [data-haldi] > div:first-child > div:last-child,html.ios [data-wedding] > div:first-child > div:last-child{position:absolute!important;top:28lvh!important}
+html.ios [data-wedding] > div:first-child > div:nth-child(3){display:none!important}
+/* iPhone v3: the whole scene (photo + words) is a fixed layer, so it stays perfectly still on screen while you scroll
+   through its window; the next section then slides up over it. Zoom and line-by-line text are driven by scroll. */
+html.ios [data-haldi] > div:first-child,html.ios [data-wedding] > div:first-child{height:190lvh!important}
+html.ios [data-haldi] > div:first-child > div:last-child,html.ios [data-wedding] > div:first-child > div:last-child{position:fixed!important;top:96px!important;left:max(20px,calc(50% - 220px))!important;right:max(20px,calc(50% - 220px))!important}
+@supports (animation-timeline: view()){
+  html.ios [data-hz],html.ios [data-wz]{animation-range:cover 28% cover 72%!important}
+  html.ios :is([data-ht="0"],[data-wt="0"]){animation-range:cover 30% cover 34%!important}
+  html.ios :is([data-ht="0.07"],[data-wt="0.07"]){animation-range:cover 32% cover 36%!important}
+  html.ios :is([data-ht="0.12"],[data-wt="0.12"]){animation-range:cover 34% cover 38%!important}
+  html.ios :is([data-ht="0.24"],[data-wt="0.24"]){animation-range:cover 37% cover 41%!important}
+  html.ios :is([data-ht="0.28"],[data-wt="0.28"]){animation-range:cover 39% cover 43%!important}
+  html.ios :is([data-ht="0.36"],[data-wt="0.36"]){animation-range:cover 42% cover 46%!important}
+  html.ios :is([data-ht="0.48"],[data-wt="0.48"]){animation-range:cover 45% cover 50%!important}
+}
+@supports (animation-timeline: view()){
+  @keyframes iosOut{from{opacity:1}to{opacity:0}}
+  html.ios [data-haldi] > div:first-child > div:last-child{animation:iosOut linear both;animation-timeline:--haldi;animation-range:cover 70% cover 78%}
+  html.ios [data-wedding] > div:first-child > div:last-child{animation:iosOut linear both;animation-timeline:--wed;animation-range:cover 66% cover 74%}
+}
