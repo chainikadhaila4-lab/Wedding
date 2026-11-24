@@ -1364,3 +1364,33 @@ footer.ft{background:linear-gradient(180deg,#2C0A11 0%,#2A0910 50%,#22070D 100%)
 .br-knot .bk-art img{mix-blend-mode:multiply}
 .br-knot .bk-art{-webkit-mask-image:none!important;mask-image:none!important}
 [data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 14%,rgba(58,13,22,0) 86%,rgba(58,13,22,.55) 100%)!important}
+
+/* ===== iPhone fixes ===== */
+/* no progress line under the menu */
+nav .thread{display:none!important}
+/* envelope, loader and Two homes run under Safari's floating bars (full screen, no bands) */
+html{background:#2A0810!important}
+html.nopin .th-stick{height:100lvh!important}
+html.nopin #homes.touch + #top{margin-top:-100lvh!important}
+html.nopin [data-k="env"]{background:radial-gradient(at 50% 42%,#4E1420 0%,#3A0D16 45%,#2A0810 100%)!important}
+/* thin dark line between the gathbandhan and the wedding photo */
+[data-wedding]{margin-top:-3px!important;position:relative;z-index:2}
+/* iPhone haldi & wedding: the words are shown fully as soon as the photo arrives (no half-faded text while scrolling) */
+html.nopin [data-ht],html.nopin [data-wt]{animation:none!important;opacity:1!important;transform:none!important}
+[data-haldi]::before{z-index:1!important}
+[data-haldi] > div:first-child > div:last-child{z-index:4!important}
+
+/* ===== iPhone: full-screen, no strips under Safari's floating toolbar, same pinned scenes as Android ===== */
+@supports (height:100lvh){
+  [data-haldi] > div:first-child,[data-wedding] > div:first-child{height:100lvh!important}
+  .th-stick{height:100lvh!important}
+  [data-haldi],[data-wedding]{height:280lvh!important}
+}
+/* envelope: one background all the way to every edge */
+[data-k="envsec"]{background:radial-gradient(at 50% 42%,#4E1420 0%,#3A0D16 45%,#22070D 100%)!important}
+[data-k="env"]{inset:0!important;padding-top:calc(120px + max(52px,6svh))!important;padding-bottom:140px!important}
+[data-k="env"] [data-k="env-lang"]{top:136px!important}
+[data-k="env"] [data-k="env-prog"]{bottom:142px!important}
+/* hairline seams between screens */
+[data-wedding]{margin-top:-2px!important}
+.br-knot{margin-bottom:-1px}

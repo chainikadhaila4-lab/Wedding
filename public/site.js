@@ -17,7 +17,8 @@
   var TOUCHDEV = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0;
   var IOSDEV = /iP(hone|ad|od)/.test(UA) || (WEBKIT && TOUCHDEV);
   // haldi & wedding: Safari's sticky pinning shakes as its toolbar resizes, so on iPhone they play while scrolling past
-  if (SDA && IOSDEV) document.documentElement.classList.add('nopin');
+  // iPhone now gets the same pinned haldi/wedding scenes as Android; heights use the large viewport (lvh) so Safari's toolbar can't make them jump
+  if (IOSDEV) document.documentElement.classList.add('ios');
   // Two homes: Safari misplaces the scroll-driven ranges here, and phones are cleaner with the step-by-step version
   var HOMES_SDA = SDA && !WEBKIT && !TOUCHDEV;
   if (HOMES_SDA) document.documentElement.classList.add('homes-sda');
