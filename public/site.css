@@ -1488,3 +1488,5 @@ html.ios .th-one{top:32%!important}
 /* gathbandhan -> wedding photo: soft fade instead of a hard straight edge */
 .br-knot{overflow:visible!important}
 .br-knot::after{content:"";position:absolute;left:0;right:0;top:100%;height:140px;z-index:4;pointer-events:none;background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,.85) 30%,rgba(246,242,234,0) 100%)}
+/* no cream band between the wedding photo and the venue curve */
+#events{padding-bottom:0!important}
