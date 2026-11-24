@@ -42,7 +42,8 @@
       if (k === 'tap' || k === 'yourInvite') k = hintKey;
       if (t[k] != null) el.textContent = t[k];
     });
-    app.setAttribute('lang', l);
+    // Marathi text is shaped as Hindi: Martel and Amita break conjuncts (स्नेहपूर्ण, अक्षय) under their Marathi setting
+    app.setAttribute('lang', l === 'mr' ? 'hi' : l);
     document.documentElement.lang = l;
     app.querySelectorAll('[data-dev]').forEach(function (el) { el.style.display = l === 'en' ? '' : 'none'; });
     app.querySelectorAll('[data-lang]').forEach(function (b) {
