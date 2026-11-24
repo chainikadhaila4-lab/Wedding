@@ -7,9 +7,17 @@
   // motion engine: browsers that support scroll-driven animations run the scenes in CSS (smooth on iPhone)
   var SDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
   if (SDA) document.documentElement.classList.add('sda');
-  // iPhone/iPad: Safari's sticky pinning shakes as its toolbar resizes, so haldi & wedding play while scrolling past instead of pinning
-  var IOSDEV = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  // Apple's engine (Safari, and every browser and in-app viewer on iPhone/iPad) is detected by engine, not just by device name,
+  // because in-app viewers and "desktop site" mode hide the iPhone name
+  var UA = navigator.userAgent;
+  var WEBKIT = (/AppleWebKit/.test(UA) && !/(Chrome|Chromium|Edg|OPR|Android)\//.test(UA)) || /CriOS|FxiOS|EdgiOS/.test(UA);
+  var TOUCHDEV = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0;
+  var IOSDEV = /iP(hone|ad|od)/.test(UA) || (WEBKIT && TOUCHDEV);
+  // haldi & wedding: Safari's sticky pinning shakes as its toolbar resizes, so on iPhone they play while scrolling past
   if (SDA && IOSDEV) document.documentElement.classList.add('nopin');
+  // Two homes: Safari misplaces the scroll-driven ranges here, and phones are cleaner with the step-by-step version
+  var HOMES_SDA = SDA && !WEBKIT && !TOUCHDEV;
+  if (HOMES_SDA) document.documentElement.classList.add('homes-sda');
   var K = function (k) { return app.querySelector('[data-k="' + k + '"]'); };
   var EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
   var OUT = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
@@ -160,6 +168,7 @@
         K('invite').style.transform = 'none';
         K('nav').style.transform = 'translateY(0)';
         body.classList.remove('locked', 'opening', 'diving'); body.classList.add('opened');
+        window.scrollTo(0, 0);   // iPhone keeps scrolling behind the envelope during a swipe: start Two homes from the top
         if (ttl) anim(ttl, [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, easing: OUT2, fill: 'none' });
         names.forEach(function (n, i) { anim(n, [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 600 + i * 220, easing: OUT2, fill: 'backwards' }); });
         petals();
@@ -223,14 +232,15 @@
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
     var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    if (TCH && !SDA) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
+    if (TCH && !HOMES_SDA) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
     function upd() {
       tk = false;
-      if (SDA) return;
+      if (HOMES_SDA) return;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       var p = c01(-r.top / span);
       if (TCH) {
+        if (!body.classList.contains('opened')) p = 0;   // nothing arrives until the envelope has opened and the guest scrolls
         if (p < 0.03) { pols.forEach(function (el) { el.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); return; }
         pols.forEach(function (el) { var k = el.dataset.s === 'bride' ? 0 : 0.24; if (p > 0.1 + k + (+el.dataset.n) * 0.06) el.classList.add('in'); });
         if (p > 0.7) sec.classList.add('joined'); else if (p < 0.6) sec.classList.remove('joined');
@@ -782,3 +792,14 @@
   upd();
 })();
 
+
+/* preview-only build label (hidden on the real site): tells us which version and motion mode a phone is running */
+(function () {
+  var h = location.hostname;
+  if (/workers\.dev$|localhost|127\.0\.0\.1/.test(h)) return;
+  var d = document.createElement('div');
+  var c = document.documentElement.className, hs = document.getElementById('homes');
+  d.textContent = 'build 107 · ' + (c.indexOf('homes-sda') > -1 ? 'css' : (hs && hs.classList.contains('touch') ? 'steps' : 'script')) + (c.indexOf('nopin') > -1 ? ' · nopin' : '');
+  d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;font:11px/1 -apple-system,sans-serif;color:#fff;background:rgba(0,0,0,.55);padding:5px 8px;border-radius:10px;pointer-events:none';
+  document.body.appendChild(d);
+})();

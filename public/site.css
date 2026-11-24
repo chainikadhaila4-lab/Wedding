@@ -140,7 +140,7 @@ img[src*="logo.png"]{display:none!important}
 /* Devanagari type: Martel for reading, Amita (calligraphic) for names and flourishes */
 html[lang="hi"] body,html[lang="mr"] body,
 html[lang="hi"] [style*="Cormorant"],html[lang="mr"] [style*="Cormorant"],
-html[lang="hi"] [style*="Tiro Devanagari"],html[lang="mr"] [style*="Tiro Devanagari"]{font-family:'Martel','Mukta',serif!important}
+html[lang="hi"] [style*="Tiro Devanagari"],html[lang="mr"] [style*="Tiro Devanagari"]{font-family:'Tiro Devanagari Hindi','Martel',serif!important}
 [style*='family: "Tiro Devanagari Hindi"']{font-family:'Martel','Tiro Devanagari Hindi',serif!important}
 html[lang="hi"] [style*="Pinyon"],html[lang="mr"] [style*="Pinyon"],
 html[lang="hi"] .th-title em,html[lang="mr"] .th-title em{font-family:'Amita','Martel',cursive!important;font-weight:700!important}
@@ -286,7 +286,7 @@ body.locked #homes .th-names>*,body.locked #homes .th-title{opacity:0}
 .inv-above{margin:4px 0 0;font-family:'Cinzel','Martel',serif;font-weight:500;font-size:clamp(17px,5vw,22px);letter-spacing:.2em;text-align:center;
   background:linear-gradient(100deg,#9C6A24 15%,#F6E2A8 38%,#D4B679 52%,#9C6A24 72%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:foil 4s linear infinite}
 @keyframes foil{from{background-position:120% 0}to{background-position:-120% 0}}
-html[lang="hi"] .inv-above,html[lang="mr"] .inv-above{font-family:'Martel',serif!important;font-size:19px}
+html[lang="hi"] .inv-above,html[lang="mr"] .inv-above{font-family:'Tiro Devanagari Hindi','Martel',serif!important;font-size:19px}
 .lt-names{margin-top:9%;display:flex;flex-direction:column;align-items:center;font-family:'Playfair Display','Amita',serif;font-style:italic;color:#7A1E2A;font-size:clamp(28px,9cqw,40px);line-height:1.08}
 .lt-names em{font-size:.6em;color:#B5223A;margin:2px 0}
 html[lang="hi"] .lt-names,html[lang="mr"] .lt-names{font-family:'Amita','Martel',serif!important;font-style:normal}
@@ -869,7 +869,7 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
 @supports (animation-timeline: view()) {
   html.sda [data-haldi]{view-timeline:--haldi block}
   html.sda [data-wedding]{view-timeline:--wed block}
-  html.sda #homes.th{view-timeline:--homes block}
+  html.homes-sda #homes.th{view-timeline:--homes block}
 
   @keyframes m-zoom{from{transform:scale(1.28)}to{transform:scale(1)}}
   @keyframes m-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -897,23 +897,23 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
   @keyframes m-joing{from{transform:none}to{transform:translateX(-26%) scale(.9)}}
   @keyframes m-one{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-  html.sda #homes .th-pol{animation:m-pol cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes}
-  html.sda #homes .th-pol[data-s="bride"]{--dx:-55%;--dr:-8deg}
-  html.sda #homes .th-pol[data-s="groom"]{--dx:55%;--dr:8deg}
-  html.sda #homes .th-pol[data-s="bride"][data-n="0"]{--r:-6deg;animation-range:contain 12% contain 26%}
-  html.sda #homes .th-pol[data-s="bride"][data-n="1"]{--r:4deg;animation-range:contain 18% contain 32%}
-  html.sda #homes .th-pol[data-s="bride"][data-n="2"]{--r:-3deg;animation-range:contain 24% contain 38%}
-  html.sda #homes .th-pol[data-s="groom"][data-n="0"]{--r:5deg;animation-range:contain 36% contain 50%}
-  html.sda #homes .th-pol[data-s="groom"][data-n="1"]{--r:-4deg;animation-range:contain 42% contain 56%}
-  html.sda #homes .th-pol[data-s="groom"][data-n="2"]{--r:3deg;animation-range:contain 48% contain 62%}
-  html.sda #homes .th-col{animation:m-joinb cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
-  html.sda #homes .th-col.g{animation-name:m-joing}
-  html.sda #homes .th-col.b .th-tag{animation:m-tag0 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
-  html.sda #homes .th-col.g .th-tag{animation:m-tag1 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
-  html.sda #homes .th-one{animation:m-one cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
+  html.homes-sda #homes .th-pol{animation:m-pol cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes}
+  html.homes-sda #homes .th-pol[data-s="bride"]{--dx:-55%;--dr:-8deg}
+  html.homes-sda #homes .th-pol[data-s="groom"]{--dx:55%;--dr:8deg}
+  html.homes-sda #homes .th-pol[data-s="bride"][data-n="0"]{--r:-6deg;animation-range:contain 12% contain 26%}
+  html.homes-sda #homes .th-pol[data-s="bride"][data-n="1"]{--r:4deg;animation-range:contain 18% contain 32%}
+  html.homes-sda #homes .th-pol[data-s="bride"][data-n="2"]{--r:-3deg;animation-range:contain 24% contain 38%}
+  html.homes-sda #homes .th-pol[data-s="groom"][data-n="0"]{--r:5deg;animation-range:contain 36% contain 50%}
+  html.homes-sda #homes .th-pol[data-s="groom"][data-n="1"]{--r:-4deg;animation-range:contain 42% contain 56%}
+  html.homes-sda #homes .th-pol[data-s="groom"][data-n="2"]{--r:3deg;animation-range:contain 48% contain 62%}
+  html.homes-sda #homes .th-col{animation:m-joinb cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
+  html.homes-sda #homes .th-col.g{animation-name:m-joing}
+  html.homes-sda #homes .th-col.b .th-tag{animation:m-tag0 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
+  html.homes-sda #homes .th-col.g .th-tag{animation:m-tag1 linear both;animation-timeline:--homes;animation-range:contain 0% contain 100%}
+  html.homes-sda #homes .th-one{animation:m-one cubic-bezier(.33,1,.68,1) both;animation-timeline:--homes;animation-range:contain 66% contain 88%}
 
   @media (prefers-reduced-motion: reduce){
-    html.sda [data-hz],html.sda [data-wz],html.sda [data-ht],html.sda [data-wt],html.sda #homes .th-pol,html.sda #homes .th-one{animation:none;opacity:1;transform:none}
+    html.sda [data-hz],html.sda [data-wz],html.sda [data-ht],html.sda [data-wt],html.homes-sda #homes .th-pol,html.homes-sda #homes .th-one{animation:none;opacity:1;transform:none}
   }
 }
 
@@ -933,3 +933,17 @@ html[lang="hi"] #events > div:nth-child(3) > div:first-child h2,html[lang="mr"] 
   html.sda.nopin :is([data-ht="0.36"],[data-wt="0.36"]){animation-range:entry 70% entry 90%}
   html.sda.nopin :is([data-ht="0.48"],[data-wt="0.48"]){animation-range:entry 78% entry 98%}
 }
+
+/* Hindi & Marathi: one reading face (Tiro Devanagari, matches the English serif), parents' lines matched in size and width */
+html[lang="hi"] #top p:has(> span[data-t="groomPar"]),html[lang="mr"] #top p:has(> span[data-t="groomPar"]),
+html[lang="hi"] #top p:has(> span[data-t="bridePar"]),html[lang="mr"] #top p:has(> span[data-t="bridePar"]){max-width:290px!important;font-size:17px!important;line-height:1.55!important;text-wrap:balance}
+/* Two homes on phones: calmer hand-offs between the bride's side, the groom's side and the join */
+#homes.touch .th-pol{transition:transform 1.1s cubic-bezier(.22,1,.36,1),opacity .8s ease!important}
+#homes.touch .th-pol[data-s="bride"]{transform:translate(-30%,24px) scale(.94) rotate(calc(var(--r) - 5deg))!important}
+#homes.touch .th-pol[data-s="groom"]{transform:translate(30%,24px) scale(.94) rotate(calc(var(--r) + 5deg))!important}
+#homes.touch .th-pol.in{opacity:1!important;transform:rotate(var(--r))!important}
+#homes.touch .th-tag{transition:opacity .45s ease!important}
+#homes.touch .th-col{transition:transform 1.3s cubic-bezier(.65,0,.35,1)!important}
+#homes.touch .th-one{transition:opacity .7s ease .9s,transform .7s cubic-bezier(.22,1,.36,1) .9s!important;transform:translateY(10px)!important}
+#homes.touch.joined .th-one{opacity:1!important;transform:none!important}
+#homes.touch:not(.joined) .th-one{transition:opacity .25s ease!important}
