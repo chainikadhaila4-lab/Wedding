@@ -5,6 +5,9 @@
   var body = document.body;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // motion engine: browsers that support scroll-driven animations run the scenes in CSS (smooth on iPhone)
+  // a refresh always starts at the envelope: stop the browser restoring the old scroll position behind it
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+  window.scrollTo(0, 0);
   var SDA = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: view()'));
   if (SDA) document.documentElement.classList.add('sda');
   // Apple's engine (Safari, and every browser and in-app viewer on iPhone/iPad) is detected by engine, not just by device name,
@@ -130,6 +133,7 @@
   var opened = false, busy = false, ot = [];
   function later(fn, ms) { ot.push(setTimeout(fn, reduce ? 0 : ms)); }
   function open() {
+    if (window.__homesReset) window.__homesReset();   // a second opening starts Two homes empty again
     if (busy || ld < 5) return;
     busy = true;
     hintKey = 'yourInvite';
@@ -265,6 +269,14 @@
         el.style.transform = 'translate(' + (dir * 55 * (1 - t)).toFixed(1) + '%,' + (40 * (1 - t)).toFixed(1) + 'px) scale(' + (0.9 + 0.1 * t).toFixed(3) + ') rotate(' + rot.toFixed(2) + 'deg)';
       });
     }
+    // clear every family photo, label and the join (used when the envelope opens again, e.g. after "back to the envelope")
+    window.__homesReset = function () {
+      pols.forEach(function (el) { el.classList.remove('in'); if (!TCH) { el.style.opacity = '0'; } });
+      tags.forEach(function (t) { t.classList.remove('in'); if (!TCH) t.style.opacity = '0'; });
+      sec.classList.remove('joined');
+      if (one && !TCH) one.style.opacity = '0';
+      if (!TCH) cols.forEach(function (c) { c.style.transform = ''; });
+    };
     window.addEventListener('scroll', function () { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
     window.addEventListener('resize', upd); upd();
     art.querySelectorAll('.th-dot').forEach(function (d) {
@@ -793,13 +805,168 @@
 })();
 
 
-/* preview-only build label (hidden on the real site): tells us which version and motion mode a phone is running */
+
+
+/* bridges between screens: toran over the card, haldi bowl, gathbandhan. Each plays when it comes on screen,
+   and plays again if the guest scrolls back up above it and returns. */
 (function () {
-  var h = location.hostname;
-  if (/workers\.dev$|localhost|127\.0\.0\.1/.test(h)) return;
-  var d = document.createElement('div');
-  var c = document.documentElement.className, hs = document.getElementById('homes');
-  d.textContent = 'build 107 · ' + (c.indexOf('homes-sda') > -1 ? 'css' : (hs && hs.classList.contains('touch') ? 'steps' : 'script')) + (c.indexOf('nopin') > -1 ? ' · nopin' : '');
-  d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:99999;font:11px/1 -apple-system,sans-serif;color:#fff;background:rgba(0,0,0,.55);padding:5px 8px;border-radius:10px;pointer-events:none';
-  document.body.appendChild(d);
+  var PC = ['#F2A51A', '#E8731A', '#F7C948', '#D7263D', '#FFF1D6'];
+  function petals(host, n, spread, up) {
+    for (var i = 0; i < n; i++) {
+      var p = document.createElement('i'); p.className = 'br-pet';
+      var a = (i / n) * Math.PI * 2, r = spread * (0.6 + ((i * 37) % 10) / 20);
+      p.style.background = PC[i % PC.length];
+      p.style.setProperty('--dx', (Math.cos(a) * r).toFixed(0) + 'px');
+      p.style.setProperty('--dy', (Math.sin(a) * r * 0.7 + (up ? -40 : 60)).toFixed(0) + 'px');
+      p.style.setProperty('--r', ((i * 67) % 360) + 'deg');
+      p.style.setProperty('--d', (0.8 + (i % 5) * 0.06).toFixed(2) + 's');
+      host.appendChild(p);
+    }
+  }
+  var hb = document.querySelector('.br-haldi'); if (hb) petals(hb, 16, 170, true);
+  var kn = document.querySelector('.br-knot'); if (kn) petals(kn, 12, 120, false);
+  kn && kn.querySelectorAll('.br-pet').forEach(function (p) { p.style.setProperty('--d', (1.55 + Math.random() * 0.2).toFixed(2) + 's'); });
+
+  // card lines rise one by one
+  var card = document.querySelector('#top > div:first-child'), inner = card && card.querySelector(':scope > div:not(.br-toran)');
+  if (inner) [].slice.call(inner.children).forEach(function (el, i) { if (el.offsetParent !== null || getComputedStyle(el).display !== 'none') { el.classList.add('cl'); el.style.setProperty('--i', i); } });
+  var toran = document.querySelector('.br-toran');
+
+  function watch(el, on, off, th) {
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) { on(); return; }
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) on();
+        // plays once per visit: no replaying when scrolling back and forth
+      });
+    }, { threshold: th || 0.25 }).observe(el);
+  }
+  function opened() { return document.body.classList.contains('opened'); }
+  watch(card, function () { if (!opened()) return; toran && toran.classList.add('play'); card.classList.add('cards-in'); },
+              function () { toran && toran.classList.remove('play'); card.classList.remove('cards-in'); }, 0.12);
+  // safety: if the card is already on screen when the envelope finishes, play it then
+  setInterval(function () { if (opened() && card && !card.classList.contains('cards-in')) { var r = card.getBoundingClientRect(); if (r.top < window.innerHeight * 0.88 && r.bottom > 0) { toran && toran.classList.add('play'); card.classList.add('cards-in'); } } }, 700);
+})();
+
+/* venue route: plays the drive when the venue comes on screen, replays after scrolling back above it */
+(function () {
+  var r = document.querySelector('.br-route'); if (!r) return;
+  var anims = r.querySelectorAll('.rv-a, .rv-m'), draw = r.querySelector('.rv-draw');
+  function play() {
+    if (r.classList.contains('play')) return;
+    r.classList.add('play');
+    anims.forEach(function (a) { try { a.beginElement(); } catch (e) {} });
+  }
+  function reset() {
+    r.classList.remove('play');
+    anims.forEach(function (a) { try { a.endElement(); } catch (e) {} });
+    if (draw) draw.setAttribute('stroke-dashoffset', '1');
+  }
+  if (!('IntersectionObserver' in window)) { play(); return; }
+  new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) play(); });
+  }, { threshold: 0.5 }).observe(r);
+})();
+
+/* paper-cut corners bloom when each cream card arrives (once); gathbandhan: cloths meet, then the knot forms */
+(function () {
+  function corners(card, which) {
+    if (!card) return;
+    which.forEach(function (w) { var c = document.createElement('i'); c.className = 'pc-corner ' + w; c.setAttribute('aria-hidden', 'true'); card.appendChild(c); });
+    if (!('IntersectionObserver' in window)) { card.classList.add('pc-in'); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && document.body.classList.contains('opened')) { card.classList.add('pc-in'); io.disconnect(); } }); }, { threshold: 0.15 });
+    io.observe(card);
+    setInterval(function () { if (!card.classList.contains('pc-in') && document.body.classList.contains('opened')) { var r = card.getBoundingClientRect(); if (r.top < innerHeight * 0.85 && r.bottom > 0) card.classList.add('pc-in'); } }, 800);
+  }
+  corners(document.querySelector('#top > div:first-child'), ['tl', 'tr', 'bl', 'br']);
+  corners(document.querySelector('#venue [data-reveal="100"]'), ['tl', 'tr']);
+  var kn = document.querySelector('.br-knot');
+  if (kn && 'MutationObserver' in window) {
+  }
+})();
+
+/* backup trigger for the section animations: some in-app viewers (like the Claude app preview) don't report
+   when an element comes into view, so also check positions on scroll and every quarter second */
+(function () {
+  function opened() { return document.body.classList.contains('opened'); }
+  var items = [
+    ['#top > div:first-child', function (el) { el.classList.add('cards-in', 'pc-in'); }],
+    ['#venue [data-reveal="100"]', function (el) { el.classList.add('pc-in'); }]
+  ].map(function (x) { return { el: document.querySelector(x[0]), go: x[1], done: false }; }).filter(function (x) { return x.el; });
+  function check() {
+    if (!opened()) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    items.forEach(function (it) {
+      if (it.done) return;
+      var r = it.el.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > vh * 0.1) { it.done = true; it.go(it.el); }
+    });
+  }
+  window.addEventListener('scroll', check, { passive: true });
+  document.addEventListener('scroll', check, { passive: true, capture: true });
+  setInterval(check, 250);
+  // haldi: the bowl rises and the marigolds burst only when the bowl is in the middle of the screen
+  var hb2 = document.querySelector('.br-haldi'), hbBand = document.querySelector('#events > div:nth-child(3) > div:first-child'), hbDone = false;
+  function haldi() {
+    if (hbDone || !hb2 || !opened()) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight, r = (hbBand || hb2).getBoundingClientRect(), mid = r.top + r.height / 2;
+    if (mid < vh * 0.6 && r.bottom > vh * 0.1) { hbDone = true; hb2.classList.add('play'); if (hbBand) hbBand.classList.add('play'); }
+  }
+  window.addEventListener('scroll', haldi, { passive: true });
+  setInterval(haldi, 200);
+  // gathbandhan: start only when the cloths are in the middle of the screen, so the guest sees the whole tying
+  var kn = document.querySelector('.br-knot'), art = kn && kn.querySelector('.bk-art'), knDone = false;
+  function knot() {
+    if (knDone || !art || !opened()) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight, r = art.getBoundingClientRect(), mid = r.top + r.height / 2;
+    if (mid < vh * 0.62 && r.bottom > vh * 0.2) { knDone = true; kn.classList.add('play'); setTimeout(function () { kn.classList.add('tied'); }, 2600); }
+  }
+  window.addEventListener('scroll', knot, { passive: true });
+  setInterval(knot, 200);
+})();
+
+/* haldi marigold burst + gathbandhan scroll hold */
+(function () {
+  var hb = document.querySelector('.br-haldi');
+  if (hb) for (var i = 0; i < 30; i++) {
+    var m = document.createElement('i'); m.className = 'br-mari' + (i % 3 === 0 ? ' y' : '');
+    var a = -Math.PI / 2 + ((i % 18) / 17 - 0.5) * Math.PI * 1.5 + (i >= 18 ? 0.09 : 0), v = 120 + ((i * 53) % 110);
+    m.style.setProperty('--s', (18 + ((i * 7) % 16)) + 'px');
+    m.style.setProperty('--dx', (Math.cos(a) * v).toFixed(0) + 'px');
+    m.style.setProperty('--up', (Math.sin(a) * v * 0.9 - 30).toFixed(0) + 'px');
+    m.style.setProperty('--dy', (Math.sin(a) * v * 0.4 + 170).toFixed(0) + 'px');
+    m.style.setProperty('--r', ((i % 2 ? 1 : -1) * (120 + (i * 37) % 240)) + 'deg');
+    m.style.setProperty('--d', (0.55 + (i % 6) * 0.05 + (i >= 18 ? 0.9 : 0)).toFixed(2) + 's');
+    hb.appendChild(m);
+  }
+
+  // gathbandhan: when it starts, bring it to the centre and hold the page still until the knot is tied
+  var kn = document.querySelector('.br-knot'), art = kn && kn.querySelector('.bk-art'); if (!kn || !art) return;
+  var locked = false;
+  function stop(e) { if (locked) e.preventDefault(); }
+  window.addEventListener('touchmove', stop, { passive: false });
+  window.addEventListener('wheel', stop, { passive: false });
+  window.addEventListener('keydown', function (e) { if (locked && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'End', 'Home'].indexOf(e.key) > -1) e.preventDefault(); });
+  new MutationObserver(function () {
+    if (!kn.classList.contains('play') || kn.dataset.held) return;
+    kn.dataset.held = '1'; locked = true;
+    var r = art.getBoundingClientRect(), target = window.scrollY + r.top + r.height / 2 - window.innerHeight / 2;
+    try { window.scrollTo({ top: target, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, target); }
+    setTimeout(function () { locked = false; }, 3900);
+  }).observe(kn, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* marigold shower positions (replaces the burst-from-bowl) */
+(function () {
+  var ms = document.querySelectorAll('.br-haldi .br-mari');
+  [].forEach.call(ms, function (m, i) {
+    m.style.setProperty('--x', (4 + ((i * 37) % 92)) + '%');
+    m.style.setProperty('--d', (((i * 13) % 20) / 10).toFixed(1) + 's');
+    m.style.setProperty('--t', (2.8 + ((i * 7) % 12) / 10).toFixed(1) + 's');
+    m.style.setProperty('--sw', (((i * 29) % 80) - 40) + 'px');
+    m.style.setProperty('--fall', (460 + ((i * 41) % 260)) + 'px');
+  });
+  var band = document.querySelector('#events > div:nth-child(3) > div:first-child'), hb = document.querySelector('.br-haldi');
+  if (band && hb) { band.style.position = 'relative'; ms.forEach ? 0 : 0; [].forEach.call(ms, function (m) { band.appendChild(m); }); }
 })();
