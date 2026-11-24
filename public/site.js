@@ -15,10 +15,15 @@
   var UA = navigator.userAgent;
   var WEBKIT = (/AppleWebKit/.test(UA) && !/(Chrome|Chromium|Edg|OPR|Android)\//.test(UA)) || /CriOS|FxiOS|EdgiOS/.test(UA);
   var TOUCHDEV = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches) || navigator.maxTouchPoints > 0;
-  var IOSDEV = /iP(hone|ad|od)/.test(UA) || (WEBKIT && TOUCHDEV);
+  var IOSDEV = !!window.FORCE_IOS || /iP(hone|ad|od)/.test(UA) || (WEBKIT && TOUCHDEV);
   // haldi & wedding: Safari's sticky pinning shakes as its toolbar resizes, so on iPhone they play while scrolling past
   // iPhone now gets the same pinned haldi/wedding scenes as Android; heights use the large viewport (lvh) so Safari's toolbar can't make them jump
-  if (IOSDEV) document.documentElement.classList.add('ios');
+  // Apple-safe mode (every iPhone/iPad browser and Mac Safari): nothing pins or is tied to the scroll;
+  // each scene plays its animation once as it arrives (see the 'apple' module at the end)
+  var APPLE = WEBKIT || IOSDEV;
+  var IOS_HOLD = IOSDEV && SDA;   // iPhone/iPad with scroll-driven support: haldi & wedding hold still (fixed scene), confirmed smooth on a real iPhone
+  if (APPLE) { if (!IOS_HOLD) { SDA = false; document.documentElement.classList.remove('sda'); } document.documentElement.classList.add('apple'); }
+  if (IOS_HOLD) document.documentElement.classList.add('ios');
   // Two homes: Safari misplaces the scroll-driven ranges here, and phones are cleaner with the step-by-step version
   var HOMES_SDA = SDA && !WEBKIT && !TOUCHDEV;
   if (HOMES_SDA) document.documentElement.classList.add('homes-sda');
@@ -237,10 +242,11 @@
     function eo(x) { return 1 - Math.pow(1 - x, 3); }
     var tk = false;
     var TCH = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    if (APPLE) TCH = true;
     if (TCH && !HOMES_SDA) { sec.classList.add('touch'); pols.forEach(function (el) { el.style.setProperty('--r', rots[el.dataset.s][+el.dataset.n] + 'deg'); }); }
     function upd() {
       tk = false;
-      if (HOMES_SDA) return;
+      if (HOMES_SDA || APPLE) return;
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - window.innerHeight;
       if (span <= 0) return;
       // on phones the card slides over the last screen of this scene, so the story finishes before that
@@ -673,7 +679,7 @@
     return clamp(-r.top / Math.max(1, r.height - window.innerHeight));
   }
   function stickyScene(sec, imgSel, txtAttr) {
-    if (!sec || SDA) return;
+    if (!sec || SDA || APPLE) return;
     var r = sec.getBoundingClientRect(), vh = window.innerHeight;
     if (r.bottom < -50 || r.top > vh + 50) return;
     var p = prog(sec);
@@ -957,7 +963,7 @@
   new MutationObserver(function () {
     if (!kn.classList.contains('play') || kn.dataset.held) return;
     kn.dataset.held = '1'; locked = true;
-    var r = art.getBoundingClientRect(), target = window.scrollY + r.top + r.height / 2 - window.innerHeight / 2;
+    var r = art.getBoundingClientRect(), target = document.documentElement.classList.contains('ios') ? window.scrollY + kn.getBoundingClientRect().top - 40 : window.scrollY + r.top + r.height / 2 - window.innerHeight / 2;
     try { window.scrollTo({ top: target, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, target); }
     setTimeout(function () { locked = false; }, 3100);
   }).observe(kn, { attributes: true, attributeFilter: ['class'] });
@@ -1073,4 +1079,48 @@
   tick(); setInterval(tick, 1000);
   var f = document.querySelector('footer.ft');
   if (f) { var ok = false; setInterval(function () { if (ok) return; var r = f.getBoundingClientRect(); if (r.top < innerHeight * 0.85) { ok = true; f.classList.add('pc-in', 'in'); } }, 250); }
+})();
+
+/* Apple-safe scenes: haldi & wedding scroll normally; when each arrives the photo zooms out once and the words rise line by line */
+(function () {
+  if (!document.documentElement.classList.contains('apple') || document.documentElement.classList.contains('ios')) return;
+  var scenes = [['[data-haldi]', 'data-ht'], ['[data-wedding]', 'data-wt']].map(function (p) {
+    var sec = document.querySelector(p[0]); if (!sec) return null;
+    sec.querySelectorAll('[' + p[1] + ']').forEach(function (el) { el.style.setProperty('--ad', (0.3 + parseFloat(el.getAttribute(p[1])) * 2.6).toFixed(2) + 's'); });
+    return { sec: sec, done: false };
+  }).filter(Boolean);
+  function chk() {
+    if (!document.body.classList.contains('opened')) return;
+    var vh = window.innerHeight || 800;
+    scenes.forEach(function (s) {
+      if (s.done) return;
+      var r = s.sec.getBoundingClientRect();
+      if (r.top < vh * 0.55 && r.bottom > vh * 0.3) { s.done = true; s.sec.classList.add('a-in'); }
+    });
+  }
+  window.addEventListener('scroll', chk, { passive: true }); setInterval(chk, 200);
+})();
+
+/* Apple-safe Two homes: every photo follows the scroll, one by one (and goes back if you scroll back up) */
+(function () {
+  if (!document.documentElement.classList.contains('apple')) return;
+  var sec = document.getElementById('homes'); if (!sec) return;
+  var pols = [].slice.call(sec.querySelectorAll('.th-pol')), tags = [].slice.call(sec.querySelectorAll('.th-tag'));
+  var bride = pols.filter(function (e) { return e.dataset.s === 'bride'; }).sort(function (a, b) { return a.dataset.n - b.dataset.n; });
+  var groom = pols.filter(function (e) { return e.dataset.s === 'groom'; }).sort(function (a, b) { return a.dataset.n - b.dataset.n; });
+  var order = bride.concat(groom);
+  function upd() {
+    if (!document.body.classList.contains('opened')) return;
+    var hold = document.documentElement.classList.contains('ios');
+    var y = hold ? -sec.getBoundingClientRect().top : window.scrollY, step = (window.innerHeight || 800) * (hold ? 0.17 : 0.045);
+    var k = Math.floor(y / step);   // 0: nothing, 1..6: photos, 7+: together
+    order.forEach(function (el, i) { el.classList.toggle('in', k >= i + 1); });
+    var j = k >= 8;
+    sec.classList.toggle('joined', j);
+    tags[0] && tags[0].classList.toggle('in', k >= 1 && !j);
+    tags[1] && tags[1].classList.toggle('in', k >= 4 && !j);
+  }
+  window.__homesReset = function () { pols.forEach(function (e) { e.classList.remove('in'); }); tags.forEach(function (t) { t.classList.remove('in'); }); sec.classList.remove('joined'); };
+  window.addEventListener('scroll', upd, { passive: true });
+  setInterval(upd, 250);
 })();

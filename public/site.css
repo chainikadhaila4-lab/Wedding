@@ -1422,3 +1422,69 @@ html.ios [data-haldi] > div:first-child > div:last-child,html.ios [data-wedding]
   html.ios [data-haldi] > div:first-child > div:last-child{animation:iosOut linear both;animation-timeline:--haldi;animation-range:cover 70% cover 78%}
   html.ios [data-wedding] > div:first-child > div:last-child{animation:iosOut linear both;animation-timeline:--wed;animation-range:cover 66% cover 74%}
 }
+/* iPhone (from the screen recording): */
+/* 1. gathbandhan fills the whole screen, so the wedding photo can't peek in below it while it holds */
+html.ios .br-knot{min-height:100lvh!important;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-top:120px!important;padding-bottom:60px!important}
+/* 2. no dark bands on the fixed photo layers (they showed as a maroon strip as the next screen slid over) */
+html.ios [data-haldi] > div:first-child > div:nth-child(2){background:none!important}
+html.ios [data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 14%)!important}
+/* 3. the map box showed up empty on iPhone; the two buttons below already open Google Maps */
+#venue iframe{display:none!important}
+#venue iframe{}
+.map-box{display:none!important}
+html.ios #events{background:#F3EADB!important}
+/* iPhone (from the real-phone video):
+   - no dark tint at the top of the held photos (it flashed maroon as the next screen slid over)
+   - the gathbandhan fills the whole screen, so the wedding photo doesn't peek in under the cloths */
+html.ios [data-haldi] > div:first-child > div:nth-child(2){background:linear-gradient(rgba(58,13,22,0) 0%,rgba(58,13,22,0) 80%,rgba(58,13,22,.35) 100%)!important}
+html.ios [data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 14%,rgba(246,242,234,0) 100%)!important}
+html.ios .br-knot{min-height:100lvh;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box}
+html.ios #venue{margin-top:-70px!important}
+.hc-curtain{display:none!important}
+/* iPhone: the haldi overlay is the 3rd child (fix the selector), fixed with the photo and with no dark bands */
+html.ios [data-haldi] > div:first-child > div[style*="inset: 0px"]{position:fixed!important;top:0!important;left:max(0px,calc(50% - 240px))!important;right:auto!important;bottom:auto!important;width:min(100vw,480px)!important;height:100lvh!important;background:linear-gradient(rgba(58,13,22,0) 0%,rgba(58,13,22,0) 80%,rgba(58,13,22,.3) 100%)!important}
+
+/* ===================== APPLE-SAFE MODE (iPhone, iPad, Mac Safari) =====================
+   No sticky, no fixed layers, no scroll-linked animation. Each scene is a normal full-screen block. */
+html.apple:not(.ios) [data-haldi],html.apple:not(.ios) [data-wedding]{height:auto!important;clip-path:none!important;-webkit-clip-path:none!important}
+html.apple:not(.ios) [data-haldi] > div:first-child,html.apple:not(.ios) [data-wedding] > div:first-child{position:relative!important;top:auto!important;height:100svh!important;min-height:640px;overflow:hidden!important}
+html.apple:not(.ios) [data-hz],html.apple:not(.ios) [data-wz],html.apple:not(.ios) [data-haldi] > div:first-child > div[style*="inset: 0px"],html.apple:not(.ios) [data-wedding] > div:first-child > div[style*="inset: 0px"]{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important}
+html.apple:not(.ios) [data-haldi] > div:first-child > div:last-child,html.apple:not(.ios) [data-wedding] > div:first-child > div:last-child{position:absolute!important;top:96px!important;left:20px!important;right:20px!important;animation:none!important}
+html.apple:not(.ios) [data-hz],html.apple:not(.ios) [data-wz]{animation:none!important;transform:scale(1.22)!important;transform-origin:50% 88%!important;transition:transform 3.4s cubic-bezier(.25,.6,.25,1)!important}
+html.apple:not(.ios) .a-in [data-hz],html.apple:not(.ios) .a-in [data-wz]{transform:none!important}
+html.apple:not(.ios) [data-ht],html.apple:not(.ios) [data-wt]{animation:none!important;opacity:0!important;transform:translateY(18px)!important;transition:opacity .9s ease var(--ad,0s),transform .9s cubic-bezier(.2,.7,.2,1) var(--ad,0s)!important}
+html.apple:not(.ios) .a-in [data-ht],html.apple:not(.ios) .a-in [data-wt]{opacity:1!important;transform:none!important}
+html.apple:not(.ios) [data-haldi] > div:first-child > div[style*="inset: 0px"]{background:linear-gradient(rgba(58,13,22,0) 0%,rgba(58,13,22,0) 80%,rgba(58,13,22,.35) 100%)!important}
+html.apple:not(.ios) [data-wedding] > div:first-child > div[style*="inset: 0px"]{background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 14%,rgba(58,13,22,0) 82%,rgba(58,13,22,.5) 100%)!important}
+html.apple:not(.ios) [data-wedding] > div:first-child > div:nth-child(3){display:none!important}
+/* envelope and two homes fill the screen behind Safari's toolbar */
+html.apple [data-k="envsec"],html.apple [data-k="loader"]{min-height:calc(100lvh + 240px)!important}
+/* Apple-safe Two homes: a normal full-screen block (no pinning); the card follows right after */
+html.apple #homes.th,html.apple #homes.touch{height:auto!important}
+html.apple .th-stick{position:relative!important;top:auto!important;height:100svh!important;min-height:640px}
+html.apple #homes.touch + #top,html.apple #top{margin-top:0!important}
+html.apple #top{padding-top:calc(30svh + 40px)!important}
+html.apple #top{margin-top:-70px!important;padding-top:110px!important;background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,0) 54px,#F3EADB 54px)!important;position:relative;z-index:6!important}
+html.apple #top > .wv.w-top{top:-20px!important}
+html.apple #top{margin-top:-96px!important}
+html.apple #top{margin-top:-96px!important}
+
+/* iPhone hold: the day's words sit lower, nearer the middle of the screen */
+html.ios [data-haldi] > div:first-child > div:last-child,html.ios [data-wedding] > div:first-child > div:last-child{top:calc(80px + 12lvh)!important}
+/* Apple: Two homes is a little taller so there's room to scroll while the families join */
+html.apple .th-stick{height:115svh!important}
+/* Apple: the families stay in view for the three scroll steps (scene is 150% tall, its picture slides slowly) */
+html.apple .th-stick{height:140svh!important}
+html.apple .th-stick{height:125svh!important}
+html.apple .th-stick{height:140svh!important}
+html.apple .th-one{top:38%!important}
+
+/* iPhone/iPad: Two homes holds still (fixed scene inside a clipped window, same technique as haldi/wedding);
+   the photos arrive with the scroll, then the card slides up over the scene */
+html.ios #homes.th{height:270lvh!important;position:relative;clip-path:inset(0 0 0 0);-webkit-clip-path:inset(0 0 0 0)}
+html.ios .th-stick{position:relative!important;top:auto!important;height:270lvh!important;min-height:0!important;overflow:visible!important}
+html.ios .th-art{position:fixed!important;top:0!important;left:max(0px,calc(50% - 240px))!important;width:min(100vw,480px)!important;height:100lvh!important}
+html.ios .th-one{top:32%!important}
+/* gathbandhan -> wedding photo: soft fade instead of a hard straight edge */
+.br-knot{overflow:visible!important}
+.br-knot::after{content:"";position:absolute;left:0;right:0;top:100%;height:140px;z-index:4;pointer-events:none;background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,.85) 30%,rgba(246,242,234,0) 100%)}
