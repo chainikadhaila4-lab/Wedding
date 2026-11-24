@@ -1250,3 +1250,117 @@ html:not(.nopin) .br-knot + [data-wedding]{margin-top:-80px!important}
 #events > div:nth-child(3) > div:first-child.play .cel-pk.p1{left:-4%!important}
 #events > div:nth-child(3) > div:first-child.play .cel-pk.p2{right:-4%!important}
 #events > div:nth-child(3) > div:first-child.play .cel-pk.p3{right:39%!important;opacity:.95}
+
+/* ===== scalloped gold divider ===== */
+.wv{position:absolute;left:0;right:0;height:90px;z-index:4;pointer-events:none}
+.wv svg:first-child{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.wv-l{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s cubic-bezier(.45,0,.2,1)}
+.wv-l.t{transition-delay:.25s}
+.wv.in .wv-l{stroke-dashoffset:0}
+.wv-o{position:absolute;left:50%;top:72px;width:30px;height:22px;margin-left:-15px;opacity:0;transform:scale(.4);transform-origin:50% 0;transition:opacity .6s ease .9s,transform .8s cubic-bezier(.3,1.6,.5,1) .9s}
+.wv.in .wv-o{opacity:1;transform:none}
+/* Two homes -> card: photo above the curve, cream below it */
+#top{background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,0) 14svh,rgba(243,234,219,.55) calc(30svh - 40px),#F3EADB calc(30svh - 1px))!important}
+#top > .wv.w-top{top:calc(30svh - 90px);z-index:7}
+/* haldi photo -> gathbandhan: the cream screen rises over the photo's bottom edge in the same shape */
+.br-knot{margin-top:-70px!important;padding-top:110px!important;position:relative;z-index:3}
+.br-knot > .wv.w-knot{top:-20px}
+.br-knot{background:linear-gradient(rgba(247,243,236,0) 0,rgba(247,243,236,0) 54px,#F7F3EC 70px,#F7F3EC 140px,rgba(247,243,236,0) 38%,rgba(246,242,234,0) 82%,#F6F2EA 100%),url(assets/wedding-sky.jpg) center bottom/100% auto no-repeat!important;background-color:transparent!important}
+.br-knot::before{top:62%!important}
+
+/* ===== The Celebrations: peacock arch (two peacocks on gold vines) unfolds from the centre ===== */
+.cel-pk,.cel-pea,.cel-cur{display:none!important}
+.cel-arch{position:relative;display:block;width:min(100%,440px);height:auto;margin:22px auto 0;z-index:2;opacity:0;clip-path:inset(0 50% 0 50%);transform:translateY(14px);transition:clip-path 2s cubic-bezier(.45,0,.2,1) .5s,opacity .8s ease .5s,transform 1.6s cubic-bezier(.22,1,.36,1) .5s}
+#events > div:nth-child(3) > div:first-child.play .cel-arch{opacity:1;clip-path:inset(0 0 0 0);transform:none}
+#events > div:nth-child(3) > div:first-child{padding-bottom:40px!important;min-height:0!important}
+@media (prefers-reduced-motion: reduce){.cel-arch{clip-path:none!important;transform:none!important;transition:opacity 1s ease!important}}
+
+/* ===== divider fixes ===== */
+.wv-l{vector-effect:none!important}
+.wv svg:first-child path.wv-l{stroke-width:1.4}
+#top{background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,0) 10svh,rgba(243,234,219,.55) calc(30svh - 56px),#F3EADB 30svh)!important}
+.br-knot{background:url(assets/wedding-sky.jpg) center bottom/100% auto no-repeat,linear-gradient(transparent 0,transparent 58px,#F7F3EC 58px)!important}
+
+/* ===== footer ===== */
+footer.ft{position:relative;overflow:hidden;margin:0!important;padding:0 18px 54px!important;text-align:center;color:#F3E6CF;background:radial-gradient(120% 70% at 50% 0%,#4A1220 0%,#33090F 55%,#22070D 100%)!important}
+footer.ft::before{content:"";position:absolute;inset:14px;border:1px solid rgba(201,160,78,.45);outline:1px solid rgba(201,160,78,.2);outline-offset:-7px;pointer-events:none}
+.ft-in{position:relative;z-index:2;padding-top:58px;max-width:420px;margin:0 auto}
+.ft-logo{display:block!important;width:86px;height:auto;margin:0 auto 18px;filter:brightness(1.15)}
+.ft-bless{margin:0;font:italic 400 20px/1.4 'Cormorant Garamond','Tiro Devanagari Hindi',serif;color:#E8D9BF}
+.ft-names{margin:8px 0 0;font:400 clamp(44px,13vw,58px)/1.1 'Pinyon Script','Amita',cursive;color:#E9C46A}
+html[lang="hi"] .ft-names,html[lang="mr"] .ft-names{font:400 34px/1.4 'Tiro Devanagari Hindi',serif}
+.ft-orn{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 26px}
+.ft-orn i{width:60px;height:1px;background:linear-gradient(90deg,transparent,#C9A04E)}.ft-orn i:last-child{background:linear-gradient(90deg,#C9A04E,transparent)}
+.ft-orn b{width:7px;height:7px;background:#C9A04E;transform:rotate(45deg)}
+.ft-k{margin:0 0 14px;font:500 11px/1.4 Jost,Mukta,sans-serif;letter-spacing:.3em;color:#C9A04E}
+html[lang="hi"] .ft-k,html[lang="mr"] .ft-k{letter-spacing:.05em;font-size:14px}
+.cd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:0 auto}
+.cd-u{padding:12px 4px 10px;border:1px solid rgba(201,160,78,.55);border-radius:10px 10px 4px 4px;background:rgba(255,240,210,.05)}
+.cd-u b{display:block;font:500 30px/1 'Cormorant Garamond',serif;font-variant-numeric:lining-nums tabular-nums;color:#F3E6CF}
+.cd-u span{display:block;margin-top:6px;font:500 9px/1 Jost,Mukta,sans-serif;letter-spacing:.18em;color:#C9A04E}
+html[lang="hi"] .cd-u span,html[lang="mr"] .cd-u span{font-size:12px;letter-spacing:0}
+.cd-done{margin:0;font:italic 400 20px/1.4 'Cormorant Garamond',serif;color:#E9C46A}
+.ft-dates{margin:26px 0 4px;font:500 11px/1.5 Jost,Mukta,sans-serif;letter-spacing:.3em;color:#E8D9BF}
+.ft-tag{margin:0 0 22px;font:italic 400 18px/1 'Cormorant Garamond',serif;color:#C9A04E}
+.ft-back{appearance:none;border:1px solid rgba(201,160,78,.7);background:transparent;color:#E9C46A;padding:11px 20px;border-radius:999px;font:500 11px/1 Jost,Mukta,sans-serif;letter-spacing:.22em;cursor:pointer}
+.ft-in > *{opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,1,.36,1)}
+footer.ft.in .ft-in > *{opacity:1;transform:none}
+footer.ft.in .ft-in > :nth-child(2){transition-delay:.1s}footer.ft.in .ft-in > :nth-child(3){transition-delay:.2s}footer.ft.in .ft-in > :nth-child(4){transition-delay:.3s}footer.ft.in .ft-in > :nth-child(5){transition-delay:.4s}footer.ft.in .ft-in > :nth-child(6){transition-delay:.5s}footer.ft.in .ft-in > :nth-child(n+7){transition-delay:.65s}
+footer.ft .ft-c{width:min(32%,150px);opacity:0;z-index:1}
+footer.ft.pc-in .ft-c{opacity:.9}
+/* divider fixes: the card's cream starts exactly under the curve; the gathbandhan keeps a solid base under its sky */
+#top{background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,0) calc(30svh - 50px),#F3EADB calc(30svh - 50px))!important}
+.br-knot{background:linear-gradient(rgba(247,243,236,0) 0,rgba(247,243,236,0) 54px,#F7F3EC 70px,#F7F3EC 140px,rgba(247,243,236,0) 38%,rgba(246,242,234,0) 82%,#F6F2EA 100%),url(assets/wedding-sky.jpg) center bottom/100% auto no-repeat,linear-gradient(transparent 54px,#F7F3EC 54px)!important}
+/* footer polish: peacock arch crown, script names, less empty space above */
+footer.ft{margin-top:-60px!important;padding-top:10px!important}
+footer.ft .ft-names{font:400 clamp(46px,13vw,60px)/1.05 'Pinyon Script',cursive!important;color:#E9C46A!important;margin:6px 0 4px!important}
+html[lang="hi"] footer.ft .ft-names,html[lang="mr"] footer.ft .ft-names{font:700 clamp(34px,10vw,44px)/1.3 'Amita',serif!important}
+footer.ft .ft-bless{font-size:19px!important;line-height:1.45!important;max-width:290px;margin-left:auto!important;margin-right:auto!important}
+.ft-arch{display:block;width:min(78%,320px);height:auto;margin:34px auto 4px;opacity:.95;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+footer.ft .ft-logo{display:none!important}
+.cd-u{background:rgba(233,196,106,.06)!important;border-color:rgba(233,196,106,.45)!important}
+footer.ft .ft-names span{font:inherit!important;color:inherit!important;letter-spacing:0!important}
+footer.ft .ft-names{font:italic 400 clamp(40px,11vw,52px)/1.1 'Playfair Display',Georgia,serif!important}
+/* Hindi/Marathi: the date line was too wide for the band and got clipped */
+html[lang="hi"] .cel-d,html[lang="mr"] .cel-d,html[lang="hi"] .cel-d span,html[lang="mr"] .cel-d span{letter-spacing:.06em!important;font-size:13px!important;white-space:normal!important}
+.cel-d{padding:0 14px}
+/* wedding photo -> venue: the same scalloped gold curve, maroon below it (no long dark block) */
+#venue{margin-top:-70px!important;padding-top:96px!important;position:relative;z-index:3;background:linear-gradient(transparent 54px,#3A0D16 54px,#2C0A11 70%)!important}
+#venue > .wv.w-ven{top:-20px}
+[data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 12%,rgba(58,13,22,0) 86%,rgba(58,13,22,.55) 100%)!important}
+#venue{margin-top:-128px!important}
+/* Two homes -> card: photo stays visible down to the gold curve (cream only below it) */
+#top{background:linear-gradient(rgba(243,234,219,0) 0,rgba(243,234,219,0) calc(30svh - 10px),#F3EADB calc(30svh - 10px))!important}
+.br-haldi,.br-haldi .br-pet,.mari-rain{display:none!important}
+/* Celebrations band: one even ivory from the card down into the haldi photo (no tan stripe) */
+#events > div:nth-child(3) > div:first-child{background:#F3EADB!important;animation:none!important}
+[data-haldi]::before{height:200px!important;background:linear-gradient(#F3EADB 0%,rgba(243,234,219,.85) 30%,rgba(243,234,219,0) 100%)!important}
+[data-haldi]::before{height:340px!important;background:linear-gradient(#F3EADB 0%,#F3EADB 22%,rgba(243,234,219,.75) 50%,rgba(243,234,219,0) 100%)!important}
+/* gathbandhan: no petal burst or pulse after the knot forms */
+.br-knot .br-pet{display:none!important}
+.br-knot.play.tied .bk-art{animation:none!important}
+/* footer: no frame or card shape, it simply continues the page's dark red */
+footer.ft::before,footer.ft::after{display:none!important}
+footer.ft .ft-c{display:none!important}
+footer.ft{background:linear-gradient(180deg,#2C0A11 0%,#2A0910 50%,#22070D 100%)!important;box-shadow:none!important;border:0!important;margin-top:0!important;padding-top:0!important}
+#venue{padding-bottom:20px!important}
+.ft-arch{margin-top:8px!important}
+/* footer ornament */
+.ft-arch{width:min(86%,360px)!important;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))!important}
+
+/* Celebrations arch: opens outward from the lotus like a blooming circle, rises gently, then one gold shimmer */
+.cel-arch{clip-path:circle(0% at 50% 72%)!important;opacity:0;transform:translateY(16px) scale(.96)!important;
+  transition:clip-path 1.9s cubic-bezier(.4,0,.2,1) .4s,opacity .9s ease .4s,transform 1.9s cubic-bezier(.22,1,.36,1) .4s!important}
+#events > div:nth-child(3) > div:first-child.play .cel-arch{clip-path:circle(80% at 50% 72%)!important;opacity:1;transform:none!important}
+.cel-arch-wrap{position:relative;width:min(100%,440px);margin:22px auto 0;overflow:hidden}
+.cel-arch-wrap .cel-arch{margin:0 auto!important;width:100%!important}
+.cel-arch-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,236,170,.55) 50%,transparent 65%);transform:translateX(-120%);mix-blend-mode:soft-light}
+#events > div:nth-child(3) > div:first-child.play .cel-arch-wrap::after{animation:archShine 1.6s ease-in-out 2.2s 1}
+@keyframes archShine{to{transform:translateX(120%)}}
+
+/* gathbandhan: one plain cream background (no sky picture), and the cloth pictures blend into it so no lighter box shows */
+.br-knot{background:linear-gradient(rgba(247,243,236,0) 0,rgba(247,243,236,0) 54px,#F6F2EA 54px)!important}
+.br-knot::before{display:none!important}
+.br-knot .bk-art img{mix-blend-mode:multiply}
+.br-knot .bk-art{-webkit-mask-image:none!important;mask-image:none!important}
+[data-wedding] > div:first-child > div:nth-child(2){background:linear-gradient(#F6F2EA 0%,rgba(246,242,234,0) 14%,rgba(58,13,22,0) 86%,rgba(58,13,22,.55) 100%)!important}

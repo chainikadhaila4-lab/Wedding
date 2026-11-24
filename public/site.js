@@ -958,7 +958,7 @@
     kn.dataset.held = '1'; locked = true;
     var r = art.getBoundingClientRect(), target = window.scrollY + r.top + r.height / 2 - window.innerHeight / 2;
     try { window.scrollTo({ top: target, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, target); }
-    setTimeout(function () { locked = false; }, 3900);
+    setTimeout(function () { locked = false; }, 3100);
   }).observe(kn, { attributes: true, attributeFilter: ['class'] });
 })();
 
@@ -1026,4 +1026,50 @@
 (function () {
   var band = document.querySelector('#events > div:nth-child(3) > div:first-child'); if (!band) return;
   ['p1', 'p2', 'p3'].forEach(function (c) { var i = document.createElement('img'); i.className = 'cel-pk ' + c; i.src = 'assets/peacock.webp'; i.alt = ''; i.setAttribute('aria-hidden', 'true'); band.appendChild(i); });
+})();
+
+/* scalloped gold dividers (Two homes -> card, haldi -> gathbandhan) and the peacock arch at The Celebrations */
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var L = 'M200,74 Q196,66 182,54 C160,36 120,34 0,34', R = 'M200,74 Q204,66 218,54 C240,36 280,34 400,34';
+  var L2 = 'M200,82 Q195,72 180,60 C158,42 118,40 0,40', R2 = 'M200,82 Q205,72 220,60 C242,42 282,40 400,40';
+  function divider(host, fill, cls) {
+    if (!host) return null;
+    var d = document.createElement('div'); d.className = 'wv ' + (cls || ''); d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<svg viewBox="0 0 400 90" preserveAspectRatio="none"><path d="M0,34 C120,34 160,36 182,54 Q196,66 200,74 Q204,66 218,54 C240,36 280,34 400,34 L400,92 L0,92 Z" fill="' + fill + '"/>' +
+      [L, R].map(function (p) { return '<path class="wv-l" d="' + p + '" pathLength="1" fill="none" stroke="#C9A04E" stroke-width="2.2"/>'; }).join('') +
+      [L2, R2].map(function (p) { return '<path class="wv-l t" d="' + p + '" pathLength="1" fill="none" stroke="#C9A04E" stroke-opacity=".55" stroke-width="1"/>'; }).join('') +
+      '</svg><svg class="wv-o" viewBox="0 0 40 30"><path d="M20,4 C24,10 25,16 20,24 C15,16 16,10 20,4Z" fill="#8A1C2B"/><path d="M20,24 C14,20 9,17 4,17 C8,22 13,25 20,24Z M20,24 C26,20 31,17 36,17 C32,22 27,25 20,24Z" fill="#A9324A"/><circle cx="20" cy="27" r="1.6" fill="#C9A04E"/></svg>';
+    host.appendChild(d);
+    return d;
+  }
+  var top = document.querySelector('#top'), kn = document.querySelector('.br-knot');
+  var w1 = divider(top, '#F3EADB', 'w-top'), w2 = divider(kn, '#F7F3EC', 'w-knot'), w3 = divider(document.getElementById('venue'), '#3A0D16', 'w-ven');
+  var band = document.querySelector('#events > div:nth-child(3) > div:first-child');
+  if (band) { var wr = document.createElement('div'); wr.className = 'cel-arch-wrap'; var pa = document.createElement('img'); pa.className = 'cel-arch'; pa.src = 'assets/peacock-arch.webp'; pa.alt = ''; pa.setAttribute('aria-hidden', 'true'); wr.appendChild(pa); band.appendChild(wr); }
+  function opened() { return document.body.classList.contains('opened'); }
+  [w1, w2, w3].forEach(function (w) {
+    if (!w) return;
+    var done = false;
+    function chk() { if (done || !opened()) return; var r = w.getBoundingClientRect(); if (r.top < innerHeight * 0.82 && r.bottom > 0) { done = true; w.classList.add('in'); } }
+    window.addEventListener('scroll', chk, { passive: true }); setInterval(chk, 250);
+  });
+})();
+
+/* footer countdown to the wedding: 29 Jan 2027, 9:00 AM India time */
+(function () {
+  var T = Date.UTC(2027, 0, 29, 3, 30, 0), box = document.querySelector('.cd'); if (!box) return;
+  var el = {}; ['d', 'h', 'm', 's'].forEach(function (k) { el[k] = box.querySelector('[data-cd="' + k + '"]'); });
+  var done = document.querySelector('.cd-done');
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function tick() {
+    var ms = T - Date.now();
+    if (ms <= 0) { box.hidden = true; if (done) done.hidden = false; return; }
+    var s = Math.floor(ms / 1000);
+    el.d.textContent = Math.floor(s / 86400); el.h.textContent = pad(Math.floor(s % 86400 / 3600));
+    el.m.textContent = pad(Math.floor(s % 3600 / 60)); el.s.textContent = pad(s % 60);
+  }
+  tick(); setInterval(tick, 1000);
+  var f = document.querySelector('footer.ft');
+  if (f) { var ok = false; setInterval(function () { if (ok) return; var r = f.getBoundingClientRect(); if (r.top < innerHeight * 0.85) { ok = true; f.classList.add('pc-in', 'in'); } }, 250); }
 })();
